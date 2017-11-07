@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="developer.ln.henrik.spacetimealarm.SpaceTimeAlarmActivity">
+
+    <TextView
+        android:id="@+id/textView_Caption"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="20dp"
+        android:text="Caption"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView_Location"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="34dp"
+        android:text="Location"
+        app:layout_constraintLeft_toLeftOf="@+id/textView_Caption"
+        app:layout_constraintTop_toBottomOf="@+id/textView_Caption" />
+
+    <TextView
+        android:id="@+id/textView_StartTime"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="32dp"
+        android:text="Start time"
+        app:layout_constraintLeft_toLeftOf="@+id/textView_Location"
+        app:layout_constraintTop_toBottomOf="@+id/textView_Location" />
+
+    <TextView
+        android:id="@+id/textView_LocationChoose"
+        android:layout_width="215dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginTop="8dp"
+        android:text="Choose Location"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/editText_Caption"
+        app:layout_constraintTop_toBottomOf="@+id/editText_Caption"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <TextView
+        android:id="@+id/textView_StartTimeChoose"
+        android:layout_width="215dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="-1dp"
+        android:layout_marginTop="9dp"
+        android:text="Choose Start time"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textView_LocationChoose"
+        app:layout_constraintTop_toBottomOf="@+id/textView_LocationChoose"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <EditText
+        android:id="@+id/editText_Caption"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginTop="8dp"
+        android:ems="10"
+        android:inputType="textPersonName"
+        app:layout_constraintLeft_toRightOf="@+id/textView_Caption"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.25" />
+
+    <TextView
+        android:id="@+id/textView_EndTime"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="32dp"
+        android:text="End time"
+        app:layout_constraintLeft_toLeftOf="@+id/textView_StartTime"
+        app:layout_constraintTop_toBottomOf="@+id/textView_StartTime" />
+
+    <TextView
+        android:id="@+id/textView_EndTimeChoose"
+        android:layout_width="215dp"
+        android:layout_height="40dp"
+        android:layout_marginLeft="0dp"
+        android:layout_marginTop="8dp"
+        android:text="Choose End Time"
+        android:textSize="18sp"
+        app:layout_constraintLeft_toLeftOf="@+id/textView_StartTimeChoose"
+        app:layout_constraintTop_toBottomOf="@+id/textView_StartTimeChoose"
+        android:layout_marginRight="8dp"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintHorizontal_bias="0.0" />
+
+    <Button
+        android:id="@+id/button_Finish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Create"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_EndTimeChoose" />
+</android.support.constraint.ConstraintLayout>

@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1096777139",
+    "firebase_url": "https://spacetimealarm.firebaseio.com",
+    "project_id": "spacetimealarm",
+    "storage_bucket": "spacetimealarm.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096777139:android:054224fc9e9bc14e",
+        "android_client_info": {
+          "package_name": "developer.ln.henrik.spacetimealarm"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096777139-29bdtklf8o6vmrfdfsgs426n37a7nbr3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "developer.ln.henrik.spacetimealarm",
+            "certificate_hash": "0f5a14e22c8b36da6fffda0db64e5e09be3e361c"
+          }
+        },
+        {
+          "client_id": "1096777139-03s8cegs0uirsguvsht8ht0nieq0hj5n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDm-1jMeDL9qNKaIRPKdfJYZ4zGRRUBArc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096777139-03s8cegs0uirsguvsht8ht0nieq0hj5n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
