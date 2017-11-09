@@ -2,21 +2,13 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.content.Intent;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.net.Uri;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
-import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -28,12 +20,8 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.GeoDataClient;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
-import com.google.android.gms.location.places.PlacePhotoMetadata;
-import com.google.android.gms.location.places.PlacePhotoMetadataResponse;
-import com.google.android.gms.location.places.PlacePhotoMetadataResult;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
-import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -41,11 +29,6 @@ import com.google.android.gms.tasks.Task;
 
 import java.io.Serializable;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
-
-import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_END_TIME;
 
 
 public class SpaceTimeAlarmActivity extends AppCompatActivity {
@@ -53,6 +36,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
     private Place location;
     private Calendar startTime;
     private Calendar endTime;
+    private String alarm_Id;
 
     private EditText editText_Caption;
     private TextView textView_LocationChoose;
@@ -77,6 +61,11 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
             SpaceTimeAlarm alarm = (SpaceTimeAlarm) getIntent().getSerializableExtra(MainActivity.EXTRA_ALARM);
             if(alarm != null)
             {
+                if(alarm.getId() != null)
+                {
+                    alarm_Id = alarm.getId();
+                }
+
                 if(alarm.getCaption() != null)
                 {
                     editText_Caption.setText(alarm.getCaption());
@@ -107,10 +96,10 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                     });
                 }
 
-                if(alarm.getStarTime() != null)
+                if(alarm.getStartTime() != null)
                 {
                     startTime = Calendar.getInstance();
-                    startTime.setTimeInMillis(alarm.getStarTime());
+                    startTime.setTimeInMillis(alarm.getStartTime());
                     textView_StartTimeChoose.setText(startTime.getTime().toString());
                 }
 
@@ -207,6 +196,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                 {
                     Intent result_intent = new Intent();
                     result_intent.putExtra(MainActivity.EXTRA_EDIT, isEdit);
+                    result_intent.putExtra(MainActivity.EXTRA_ALARM_ID, alarm_Id);
                     result_intent.putExtra(MainActivity.EXTRA_CAPTION, editText_Caption.getText().toString());
                     if(location != null)
                     {
