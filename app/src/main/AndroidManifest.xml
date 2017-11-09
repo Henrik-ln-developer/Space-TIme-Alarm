@@ -2,6 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="developer.ln.henrik.spacetimealarm">
 
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -19,9 +23,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".SpaceTimeAlarmActivity"></activity>
-        <uses-permission android:name="android.permission.INTERNET" />
-        <uses-permission android:name="android.permission.ACESS_NETWORK_STATE" />
-        <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     </application>
 
 </manifest>
