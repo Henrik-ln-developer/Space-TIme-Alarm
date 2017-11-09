@@ -3,7 +3,6 @@ package developer.ln.henrik.spacetimealarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,15 +22,13 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
-import static android.R.attr.button;
-import static android.R.attr.data;
-import static android.R.attr.id;
-import static developer.ln.henrik.spacetimealarm.R.id.textView_LocationChoose;
+import static android.R.attr.key;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -49,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_HANDLER = "EXTRA HANDLER";
     public static final String EXTRA_TIME_PICKER = "EXTRA TIME PICKER";
     public static final String EXTRA_ALARM = "EXTRA ALARM";
+    public static final String EXTRA_ALARM_ID = "EXTRA ALARM ID";
 
 
     public static final int REQUEST_CODE_ALARM = 1;
@@ -65,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     DatabaseReference database;
     AlarmManager alarmManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,12 +89,60 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
+                SpaceTimeAlarm changedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
+                if(changedAlarm != null)
+                {
+                    Log.d("CHECKSTUFF", "Leder efter alarm med ID: " + changedAlarm.getId());
+                    for(SpaceTimeAlarm alarm : alarmArray)
+                    {
+                        if(alarm.getId() != null)
+                        {
+                            Log.d("CHECKSTUFF", "Checker alarm med ID: " + alarm.getId());
+                            if(alarm.getId().equals(changedAlarm.getId()))
+                            {
+                                alarm.setCaption(changedAlarm.getCaption());
+                                alarm.setLocation_Id(changedAlarm.getLocation_Id());
+                                alarm.setLocation_Name(changedAlarm.getLocation_Name());
+                                alarm.setLocation_Lat(changedAlarm.getLocation_Lat());
+                                alarm.setLocation_Lng(changedAlarm.getLocation_Lng());
+                                alarm.setStartTime(changedAlarm.getStartTime());
+                                alarm.setEndTime(changedAlarm.getEndTime());
+                                alarmAdapter.notifyDataSetChanged();
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            Log.d("CHECKSTUFF", "Ingen ID på alarm");
+                        }
+                    }
+                    Toast.makeText(getApplicationContext(), "Couldn't find alarm in list", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
+                SpaceTimeAlarm deletedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
+                if(deletedAlarm != null)
+                {
+                    Log.d("CHECKSTUFF", "Leder efter alarm med ID: " + deletedAlarm.getId());
+                    for(SpaceTimeAlarm alarm : alarmArray)
+                    {
+                        if(alarm.getId() != null)
+                        {
+                            Log.d("CHECKSTUFF", "Checker alarm med ID: " + alarm.getId());
+                            if(alarm.getId().equals(deletedAlarm.getId()))
+                            {
+                                alarmArray.remove(alarm);
+                            }
+                        }
+                        else
+                        {
+                            Log.d("CHECKSTUFF", "Ingen ID på alarm");
+                        }
+                    }
+                    Toast.makeText(getApplicationContext(), "Couldn't find alarm in list", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -135,6 +182,7 @@ public class MainActivity extends AppCompatActivity {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
                 boolean isEdit = data.getBooleanExtra(EXTRA_EDIT, false);
+                String alarm_Id = data.getStringExtra(EXTRA_ALARM_ID);
                 String caption = data.getStringExtra(EXTRA_CAPTION);
                 String location_Id = data.getStringExtra(EXTRA_LOCATION_ID);
                 String location_Name = data.getStringExtra(EXTRA_LOCATION_NAME);
@@ -149,15 +197,30 @@ public class MainActivity extends AppCompatActivity {
 
                 if(caption != null && ((location_lat != null && location_lng != null) || alarmStartTime != null))
                 {
-                    final SpaceTimeAlarm alarm = new SpaceTimeAlarm(caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime);
-                    database.push().setValue(alarm).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    final SpaceTimeAlarm alarm;
+                    if(alarm_Id != null)
+                    {
+                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime);
+                        Log.d("CHECKSTUFF", "Updating alarm with id: " + alarm_Id);
+                    }
+                    else
+                    {
+                        String newId = database.push().getKey();
+                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime);
+                        Log.d("CHECKSTUFF", "Creating alarm with id: " + newId);
+                    }
+
+                    Map<String, Object> postValues = alarm.toMap();
+                    Map<String, Object> childUpdates = new HashMap<>();
+                    childUpdates.put("/" + alarm.getId(), postValues);
+                    database.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
                                 Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
                                 intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
                                 PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent_SetAlarm, 0);
-                                if(alarm.getStarTime() != null)
+                                if(alarm.getStartTime() != null)
                                 {
                                     alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, pendingIntent);
                                     Toast.makeText(getApplicationContext(), "Data Saved and alarm set", Toast.LENGTH_SHORT).show();
@@ -171,7 +234,30 @@ public class MainActivity extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), "" + task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
                             }
                         }
-                    });;
+                    });
+
+                    /*database.push().setValue(alarm).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
+                                intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
+                                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent_SetAlarm, 0);
+                                if(alarm.getStartTime() != null)
+                                {
+                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, pendingIntent);
+                                    Toast.makeText(getApplicationContext(), "Data Saved and alarm set", Toast.LENGTH_SHORT).show();
+                                }
+                                else
+                                {
+                                    Toast.makeText(getApplicationContext(), "Data Saved", Toast.LENGTH_SHORT).show();
+                                }
+
+                            } else {
+                                Toast.makeText(getApplicationContext(), "" + task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                    });;*/
                 }
                 else
                 {
