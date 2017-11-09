@@ -10,6 +10,7 @@ public class SpaceTimeAlarm implements Serializable {
 
     private String id;
     private String caption;
+    private String location_Id;
     private String location_Name;
     private Double location_Lat;
     private Double location_Lng;
@@ -19,8 +20,9 @@ public class SpaceTimeAlarm implements Serializable {
     public SpaceTimeAlarm() {
     }
 
-    public SpaceTimeAlarm(String caption, String location_Name, Double location_Lat, Double location_Lng, Long starTime, Long endTime) {
+    public SpaceTimeAlarm(String caption, String location_Id, String location_Name, Double location_Lat, Double location_Lng, Long starTime, Long endTime) {
         this.caption = caption;
+        this.location_Id = location_Id;
         this.location_Name = location_Name;
         this.location_Lat = location_Lat;
         this.location_Lng = location_Lng;
@@ -83,6 +85,10 @@ public class SpaceTimeAlarm implements Serializable {
     public void setEndTime(Long endTime) {
         this.endTime = endTime;
     }
+
+    public String getLocation_Id() { return location_Id; }
+
+    public void setLocation_Id(String location_Id) { this.location_Id = location_Id; }
 
     @Override
     public String toString() {
