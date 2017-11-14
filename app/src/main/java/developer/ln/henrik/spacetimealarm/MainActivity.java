@@ -47,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_TIME_PICKER = "EXTRA TIME PICKER";
     public static final String EXTRA_ALARM = "EXTRA ALARM";
     public static final String EXTRA_ALARM_ID = "EXTRA ALARM ID";
+    public static final String EXTRA_REQUESTCODE = "EXTRA REQUESTCODE";
+
 
 
     public static final int REQUEST_CODE_ALARM = 1;
@@ -76,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
         database = firebaseDatabase.getReference("alarms");
         database.addChildEventListener(new ChildEventListener() {
 
-
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 SpaceTimeAlarm alarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
@@ -84,6 +85,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     alarmArray.add(alarm);
                     alarmAdapter.notifyDataSetChanged();
+                    setAlarm(alarm);
                 }
             }
 
@@ -108,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
                                 alarm.setStartTime(changedAlarm.getStartTime());
                                 alarm.setEndTime(changedAlarm.getEndTime());
                                 alarmAdapter.notifyDataSetChanged();
+                                setAlarm(alarm);
                                 return;
                             }
                         }
@@ -191,22 +194,24 @@ public class MainActivity extends AppCompatActivity {
                 Double location_lng = data.getDoubleExtra(EXTRA_LOCATION_LNG, 0);
                 location_lng = location_lng == 0 ? null : location_lng;
                 Long startTime = data.getLongExtra(EXTRA_START_TIME, 0);
-                final Long alarmStartTime = startTime == 0 ? null : startTime;
+                startTime = startTime == 0 ? null : startTime;
                 Long endTime = data.getLongExtra(EXTRA_END_TIME, 0);
                 endTime = endTime == 0 ? null : endTime;
+                int alarm_RequestCode = data.getIntExtra(EXTRA_REQUESTCODE, 0);
+                alarm_RequestCode = alarm_RequestCode == 0 ? getNextAlarmRequestCode() : alarm_RequestCode;
 
-                if(caption != null && ((location_lat != null && location_lng != null) || alarmStartTime != null))
+                if(caption != null && ((location_lat != null && location_lng != null) || startTime != null))
                 {
                     final SpaceTimeAlarm alarm;
                     if(alarm_Id != null)
                     {
-                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime);
+                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime, alarm_RequestCode);
                         Log.d("CHECKSTUFF", "Updating alarm with id: " + alarm_Id);
                     }
                     else
                     {
                         String newId = database.push().getKey();
-                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime);
+                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime, alarm_RequestCode);
                         Log.d("CHECKSTUFF", "Creating alarm with id: " + newId);
                     }
 
@@ -217,47 +222,12 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-                                intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent_SetAlarm, 0);
-                                if(alarm.getStartTime() != null)
-                                {
-                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, pendingIntent);
-                                    Toast.makeText(getApplicationContext(), "Data Saved and alarm set", Toast.LENGTH_SHORT).show();
-                                }
-                                else
-                                {
-                                    Toast.makeText(getApplicationContext(), "Data Saved", Toast.LENGTH_SHORT).show();
-                                }
-
+                                Toast.makeText(getApplicationContext(), "Alarm Saved", Toast.LENGTH_SHORT).show();
                             } else {
                                 Toast.makeText(getApplicationContext(), "" + task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
                             }
                         }
                     });
-
-                    /*database.push().setValue(alarm).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-                                intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                                PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, 0, intent_SetAlarm, 0);
-                                if(alarm.getStartTime() != null)
-                                {
-                                    alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarmStartTime, pendingIntent);
-                                    Toast.makeText(getApplicationContext(), "Data Saved and alarm set", Toast.LENGTH_SHORT).show();
-                                }
-                                else
-                                {
-                                    Toast.makeText(getApplicationContext(), "Data Saved", Toast.LENGTH_SHORT).show();
-                                }
-
-                            } else {
-                                Toast.makeText(getApplicationContext(), "" + task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                    });;*/
                 }
                 else
                 {
@@ -273,18 +243,40 @@ public class MainActivity extends AppCompatActivity {
 
     private void createOrEditAlarm(SpaceTimeAlarm alarm)
     {
-        Intent intent_CreateorEditAlarm = new Intent(MainActivity.this, SpaceTimeAlarmActivity.class);
+        Intent intent_CreateOrEditAlarm = new Intent(MainActivity.this, SpaceTimeAlarmActivity.class);
 
         if(alarm != null)
         {
-            intent_CreateorEditAlarm.putExtra(EXTRA_EDIT, true);
-            intent_CreateorEditAlarm.putExtra(EXTRA_ALARM, alarm);
+            intent_CreateOrEditAlarm.putExtra(EXTRA_EDIT, true);
+            intent_CreateOrEditAlarm.putExtra(EXTRA_ALARM, alarm);
         }
         else
         {
-            intent_CreateorEditAlarm.putExtra(EXTRA_EDIT, false);
+            intent_CreateOrEditAlarm.putExtra(EXTRA_EDIT, false);
         }
-        startActivityForResult(intent_CreateorEditAlarm, REQUEST_CODE_ALARM);
+        startActivityForResult(intent_CreateOrEditAlarm, REQUEST_CODE_ALARM);
     }
 
+    private void setAlarm(SpaceTimeAlarm alarm)
+    {
+        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
+        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
+        alarmManager.cancel(pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent);
+    }
+
+    private int getNextAlarmRequestCode()
+    {
+        int highestRequestCode = 0;
+        for(SpaceTimeAlarm alarm : alarmArray)
+        {
+            int currentRequestCode = alarm.getRequestCode();
+            if(currentRequestCode > highestRequestCode)
+            {
+                highestRequestCode = currentRequestCode;
+            }
+        }
+        return highestRequestCode+1;
+    }
 }

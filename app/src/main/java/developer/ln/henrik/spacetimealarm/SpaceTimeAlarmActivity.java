@@ -30,6 +30,8 @@ import com.google.android.gms.tasks.Task;
 import java.io.Serializable;
 import java.util.Calendar;
 
+import static android.R.attr.data;
+
 
 public class SpaceTimeAlarmActivity extends AppCompatActivity {
 
@@ -37,6 +39,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
     private Calendar startTime;
     private Calendar endTime;
     private String alarm_Id;
+    private Integer requestCode;
 
     private EditText editText_Caption;
     private TextView textView_LocationChoose;
@@ -109,6 +112,12 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                     endTime.setTimeInMillis(alarm.getEndTime());
                     textView_EndTimeChoose.setText(endTime.getTime().toString());
                 }
+
+                if(alarm.getRequestCode() != null)
+                {
+                    requestCode = alarm.getRequestCode();
+                }
+
             }
             else
             {
@@ -205,10 +214,18 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                         result_intent.putExtra(MainActivity.EXTRA_LOCATION_LNG, location.getLatLng().latitude);
                         result_intent.putExtra(MainActivity.EXTRA_LOCATION_NAME, location.getAddress().toString());
                     }
-                    long startTimeMillis = startTime == null ? 0 : startTime.getTimeInMillis();
-                    result_intent.putExtra(MainActivity.EXTRA_START_TIME, startTimeMillis);
-                    long endTimeMillis = endTime == null ? 0 : endTime.getTimeInMillis();
-                    result_intent.putExtra(MainActivity.EXTRA_END_TIME, endTimeMillis);
+                    if(startTime != null)
+                    {
+                        result_intent.putExtra(MainActivity.EXTRA_START_TIME, startTime.getTimeInMillis());
+                    }
+                    if (endTime != null)
+                    {
+                        result_intent.putExtra(MainActivity.EXTRA_END_TIME, endTime.getTimeInMillis());
+                    }
+                    if (requestCode != null)
+                    {
+                        result_intent.putExtra(MainActivity.EXTRA_REQUESTCODE, requestCode);
+                    }
                     setResult(RESULT_OK, result_intent);
                     finish();
                 }

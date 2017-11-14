@@ -15,11 +15,12 @@ public class SpaceTimeAlarm implements Serializable {
     private Double location_Lng;
     private Long startTime;
     private Long endTime;
+    private Integer requestCode;
 
     public SpaceTimeAlarm() {
     }
 
-    public SpaceTimeAlarm(String id, String caption, String location_Id, String location_Name, Double location_Lat, Double location_Lng, Long startTime, Long endTime) {
+    public SpaceTimeAlarm(String id, String caption, String location_Id, String location_Name, Double location_Lat, Double location_Lng, Long startTime, Long endTime, int requestCode) {
         this.id = id;
         this.caption = caption;
         this.location_Id = location_Id;
@@ -28,6 +29,7 @@ public class SpaceTimeAlarm implements Serializable {
         this.location_Lng = location_Lng;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.requestCode = requestCode;
     }
 
     public String getId() {
@@ -90,16 +92,22 @@ public class SpaceTimeAlarm implements Serializable {
 
     public void setLocation_Id(String location_Id) { this.location_Id = location_Id; }
 
+    public Integer getRequestCode() { return requestCode; }
+
+    public void setRequestCode(int requestCode) { this.requestCode = requestCode; }
+
     @Override
     public String toString() {
         return "SpaceTimeAlarm{" +
                 "id='" + id + '\'' +
                 ", caption='" + caption + '\'' +
+                ", location_Id='" + location_Id + '\'' +
                 ", location_Name='" + location_Name + '\'' +
                 ", location_Lat=" + location_Lat +
                 ", location_Lng=" + location_Lng +
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
+                ", requestCode=" + requestCode +
                 '}';
     }
 
@@ -113,6 +121,7 @@ public class SpaceTimeAlarm implements Serializable {
         result.put("location_Lng", location_Lng);
         result.put("startTime", startTime);
         result.put("endTime", endTime);
+        result.put("requestCode", requestCode);
         return result;
     }
 
