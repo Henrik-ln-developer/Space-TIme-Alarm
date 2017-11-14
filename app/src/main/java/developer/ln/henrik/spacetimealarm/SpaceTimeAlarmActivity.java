@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
@@ -90,7 +91,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                             if (places.getCount() > 0) {
                                 location = places.get(0).freeze();
                                 if (location != null) {
-                                    textView_LocationChoose.setText(location.toString());
+                                    textView_LocationChoose.setText(location.getAddress());
                                 }
                             } else {
                                 Toast.makeText(SpaceTimeAlarmActivity.this, "Couldn't find alarm's location", Toast.LENGTH_SHORT).show();
@@ -109,13 +110,13 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                 {
                     startTime = Calendar.getInstance();
                     startTime.setTimeInMillis(alarm.getStartTime());
-                    textView_StartTimeChoose.setText(startTime.getTime().toString());
+                    textView_StartTimeChoose.setText((new SimpleDateFormat( "HH:mm" ).format(startTime.getTime())));
                 }
 
                 if (alarm.getEndTime() != null) {
                     endTime = Calendar.getInstance();
                     endTime.setTimeInMillis(alarm.getEndTime());
-                    textView_EndTimeChoose.setText(endTime.getTime().toString());
+                    textView_EndTimeChoose.setText((new SimpleDateFormat( "HH:mm" ).format(endTime.getTime())));
                 }
 
                 if(alarm.getRequestCode() != null)
@@ -141,7 +142,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
             if (resultCode == RESULT_OK) {
                 location = PlacePicker.getPlace(data, this);
                 if (location != null) {
-                    textView_LocationChoose.setText(location.toString());
+                    textView_LocationChoose.setText(location.getAddress());
                 }
             }
         }
@@ -251,14 +252,14 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                 startTime = Calendar.getInstance();
                 startTime.set(Calendar.HOUR_OF_DAY, timeHour);
                 startTime.set(Calendar.MINUTE, timeMinute);
-                textView_StartTimeChoose.setText(startTime.getTime().toString());
+                textView_StartTimeChoose.setText((new SimpleDateFormat( "HH:mm" ).format(startTime.getTime())));
             }
             else if(type == MainActivity.REQUEST_CODE_END_TIME)
             {
                 endTime = Calendar.getInstance();
                 endTime.set(Calendar.HOUR_OF_DAY, timeHour);
                 endTime.set(Calendar.MINUTE, timeMinute);
-                textView_EndTimeChoose.setText(endTime.getTime().toString());
+                textView_EndTimeChoose.setText((new SimpleDateFormat( "HH:mm" ).format(endTime.getTime())));
             }
             else
             {
