@@ -2,15 +2,10 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
-import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.TimePicker;
-
-import static android.app.Activity.RESULT_OK;
-import static developer.ln.henrik.spacetimealarm.R.id.textView_LocationChoose;
 
 
 public class TimePickerDialogFragment extends android.support.v4.app.DialogFragment {

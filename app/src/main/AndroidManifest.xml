@@ -23,6 +23,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".SpaceTimeAlarmActivity"></activity>
+        <service android:name=".GeofenceAlarmReceiver"/>
+
     </application>
 
 </manifest>

@@ -3,19 +3,26 @@ package developer.ln.henrik.spacetimealarm;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Space;
 import android.widget.Toast;
 
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -26,8 +33,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.R.attr.key;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -48,23 +53,27 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_ALARM = "EXTRA ALARM";
     public static final String EXTRA_ALARM_ID = "EXTRA ALARM ID";
     public static final String EXTRA_REQUESTCODE = "EXTRA REQUESTCODE";
-
-
+    public static final String EXTRA_RADIUS = "EXTRA RADIUS";
 
     public static final int REQUEST_CODE_ALARM = 1;
     public static final int REQUEST_CODE_LOCATION = 2;
     public static final int REQUEST_CODE_START_TIME = 3;
     public static final int REQUEST_CODE_END_TIME = 4;
+    public static final int REQUEST_CODE_FINE_LOCATION = 5;
+
 
     public static final double ZOOM_VARIABLE = 0.01;
+    public static final long GEOFENCE_EXPIRATION_TIME = 999999999;
 
     private ListView listView_Alarms;
     private ArrayList<SpaceTimeAlarm> alarmArray;
-    private ArrayAdapter<SpaceTimeAlarm> alarmAdapter;
+    private SpaceTimeAlarmAdapter alarmAdapter;
     private Button button_NewAlarm;
 
-    DatabaseReference database;
-    AlarmManager alarmManager;
+    private DatabaseReference database;
+    private AlarmManager alarmManager;
+    private GeofencingClient geofencingManager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         alarmArray = new ArrayList<>();
-        alarmAdapter = new ArrayAdapter<SpaceTimeAlarm>(this, android.R.layout.simple_list_item_1, alarmArray);
+        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, this);
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         database = firebaseDatabase.getReference("alarms");
@@ -159,7 +168,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
+        geofencingManager = LocationServices.getGeofencingClient(this);
         listView_Alarms = (ListView) findViewById(R.id.listView_Alarms) ;
         listView_Alarms.setAdapter(alarmAdapter);
         listView_Alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -193,6 +202,7 @@ public class MainActivity extends AppCompatActivity {
                 location_lat = location_lat == 0 ? null : location_lat;
                 Double location_lng = data.getDoubleExtra(EXTRA_LOCATION_LNG, 0);
                 location_lng = location_lng == 0 ? null : location_lng;
+                Integer radius = data.getIntExtra(EXTRA_RADIUS, 0);
                 Long startTime = data.getLongExtra(EXTRA_START_TIME, 0);
                 startTime = startTime == 0 ? null : startTime;
                 Long endTime = data.getLongExtra(EXTRA_END_TIME, 0);
@@ -205,13 +215,13 @@ public class MainActivity extends AppCompatActivity {
                     final SpaceTimeAlarm alarm;
                     if(alarm_Id != null)
                     {
-                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime, alarm_RequestCode);
+                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode);
                         Log.d("CHECKSTUFF", "Updating alarm with id: " + alarm_Id);
                     }
                     else
                     {
                         String newId = database.push().getKey();
-                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, startTime, endTime, alarm_RequestCode);
+                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode);
                         Log.d("CHECKSTUFF", "Creating alarm with id: " + newId);
                     }
 
@@ -263,9 +273,51 @@ public class MainActivity extends AppCompatActivity {
         intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
         if(alarm.getRequestCode() != null)
         {
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
-            alarmManager.cancel(pendingIntent);
-            alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent);
+            if(alarm.getStartTime() != null)
+            {
+                PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
+                alarmManager.cancel(pendingIntent_Alarm);
+                alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
+            }
+
+            if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
+            {
+                Intent intent = new Intent(this, GeofenceAlarmReceiver.class);
+                PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+                builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+                Geofence geofence = new Geofence.Builder()
+                        .setRequestId(alarm.getId())
+                        .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
+                        .setExpirationDuration(GEOFENCE_EXPIRATION_TIME)
+                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                        .build();
+                ArrayList<Geofence> geofences = new ArrayList<>();
+                geofences.add(geofence);
+                builder.addGeofences(geofences);
+                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                {
+                    geofencingManager.removeGeofences(pendingIntent_Geofence);
+                    geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
+                            .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Toast.makeText(MainActivity.this, "Location alarm set", Toast.LENGTH_SHORT).show();
+                                }
+                            })
+                            .addOnFailureListener(this, new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Toast.makeText(MainActivity.this, "Failed to set Location alarm", Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                }
+                else
+                {
+                    ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
+                    Toast.makeText(MainActivity.this, "Needs ACCESS_FINE_LOCATION Permission", Toast.LENGTH_SHORT).show();
+                }
+            }
         }
     }
 
