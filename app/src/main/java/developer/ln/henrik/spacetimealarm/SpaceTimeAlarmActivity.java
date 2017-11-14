@@ -1,12 +1,29 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcelable;
+import android.provider.Settings;
+import android.support.annotation.IntDef;
 
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
+
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,6 +39,9 @@ import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBufferResponse;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
+
+import com.google.android.gms.maps.GoogleMap;
+
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -47,6 +67,11 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
     private TextView textView_EndTimeChoose;
     private Button button_Finish;
 
+    private GoogleMap mMap;
+
+    private static final int REQUEST_LOCATION = 1;
+    LocationManager locationManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -59,9 +84,9 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
         button_Finish = (Button) findViewById(R.id.button_Finish);
 
         final boolean isEdit = getIntent().getBooleanExtra(MainActivity.EXTRA_EDIT, false);
-        if(isEdit)
-        {
+        if (isEdit) {
             SpaceTimeAlarm alarm = (SpaceTimeAlarm) getIntent().getSerializableExtra(MainActivity.EXTRA_ALARM);
+
             if(alarm != null)
             {
                 if(alarm.getId() != null)
@@ -74,24 +99,19 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                     editText_Caption.setText(alarm.getCaption());
                 }
 
-                if(alarm.getLocation_Id() != null)
-                {
+                if (alarm.getLocation_Id() != null) {
                     GeoDataClient geoDataClient = Places.getGeoDataClient(this, null);
                     Task<PlaceBufferResponse> response = geoDataClient.getPlaceById(alarm.getLocation_Id());
                     response.addOnCompleteListener(new OnCompleteListener<PlaceBufferResponse>() {
                         @Override
                         public void onComplete(@NonNull Task<PlaceBufferResponse> task) {
                             PlaceBufferResponse places = task.getResult();
-                            if(places.getCount() > 0)
-                            {
+                            if (places.getCount() > 0) {
                                 location = places.get(0).freeze();
-                                if(location != null)
-                                {
+                                if (location != null) {
                                     textView_LocationChoose.setText(location.toString());
                                 }
-                            }
-                            else
-                            {
+                            } else {
                                 Toast.makeText(SpaceTimeAlarmActivity.this, "Couldn't find alarm's location", Toast.LENGTH_SHORT).show();
                             }
                             places.release();
@@ -106,8 +126,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                     textView_StartTimeChoose.setText(startTime.getTime().toString());
                 }
 
-                if(alarm.getEndTime() != null)
-                {
+                if (alarm.getEndTime() != null) {
                     endTime = Calendar.getInstance();
                     endTime.setTimeInMillis(alarm.getEndTime());
                     textView_EndTimeChoose.setText(endTime.getTime().toString());
@@ -117,7 +136,6 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                 {
                     requestCode = alarm.getRequestCode();
                 }
-
             }
             else
             {
@@ -132,13 +150,11 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 PlacePicker.IntentBuilder builder = new PlacePicker.IntentBuilder();
-                if(location != null) {
-                    LatLng northeast = new LatLng(location.getLatLng().latitude-MainActivity.ZOOM_VARIABLE, location.getLatLng().longitude-MainActivity.ZOOM_VARIABLE);
-                    LatLng southwest = new LatLng(location.getLatLng().latitude+MainActivity.ZOOM_VARIABLE, location.getLatLng().longitude+MainActivity.ZOOM_VARIABLE);
+                if (location != null) {
+                    LatLng northeast = new LatLng(location.getLatLng().latitude - MainActivity.ZOOM_VARIABLE, location.getLatLng().longitude - MainActivity.ZOOM_VARIABLE);
+                    LatLng southwest = new LatLng(location.getLatLng().latitude + MainActivity.ZOOM_VARIABLE, location.getLatLng().longitude + MainActivity.ZOOM_VARIABLE);
                     LatLngBounds latLngBounds = new LatLngBounds(northeast, southwest);
                     builder.setLatLngBounds(latLngBounds);
-                } else {
-
                 }
 
                 try {
@@ -158,8 +174,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putInt(MainActivity.EXTRA_TYPE, MainActivity.REQUEST_CODE_START_TIME);
                 bundle.putSerializable(MainActivity.EXTRA_HANDLER, new TimePickerHandler());
-                if(startTime != null)
-                {
+                if (startTime != null) {
                     bundle.putInt(MainActivity.EXTRA_HOUR, startTime.get(Calendar.HOUR_OF_DAY));
                     bundle.putInt(MainActivity.EXTRA_MIN, startTime.get(Calendar.MINUTE));
                 }
@@ -177,8 +192,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putInt(MainActivity.EXTRA_TYPE, MainActivity.REQUEST_CODE_END_TIME);
                 bundle.putSerializable(MainActivity.EXTRA_HANDLER, new TimePickerHandler());
-                if(endTime != null)
-                {
+                if (endTime != null) {
                     bundle.putInt(MainActivity.EXTRA_HOUR, endTime.get(Calendar.HOUR_OF_DAY));
                     bundle.putInt(MainActivity.EXTRA_MIN, endTime.get(Calendar.MINUTE));
                 }
@@ -193,22 +207,16 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
         button_Finish.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(editText_Caption.getText().toString().equals(""))
-                {
+                if (editText_Caption.getText().toString().equals("")) {
                     Toast.makeText(SpaceTimeAlarmActivity.this, "An alarm needs a caption", Toast.LENGTH_SHORT).show();
-                }
-                else if(textView_LocationChoose.getText().toString().equals("Choose Location") && textView_StartTimeChoose.getText().toString().equals("Choose Start time"))
-                {
+                } else if (textView_LocationChoose.getText().toString().equals("Choose Location") && textView_StartTimeChoose.getText().toString().equals("Choose Start time")) {
                     Toast.makeText(SpaceTimeAlarmActivity.this, "An alarm needs a Location or a Start time", Toast.LENGTH_SHORT).show();
-                }
-                else
-                {
+                } else {
                     Intent result_intent = new Intent();
                     result_intent.putExtra(MainActivity.EXTRA_EDIT, isEdit);
                     result_intent.putExtra(MainActivity.EXTRA_ALARM_ID, alarm_Id);
                     result_intent.putExtra(MainActivity.EXTRA_CAPTION, editText_Caption.getText().toString());
-                    if(location != null)
-                    {
+                    if (location != null) {
                         result_intent.putExtra(MainActivity.EXTRA_LOCATION_ID, location.getId());
                         result_intent.putExtra(MainActivity.EXTRA_LOCATION_LAT, location.getLatLng().latitude);
                         result_intent.putExtra(MainActivity.EXTRA_LOCATION_LNG, location.getLatLng().latitude);
@@ -241,8 +249,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity {
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(data, this);
                 location = place;
-                if(location != null)
-                {
+                if (location != null) {
                     textView_LocationChoose.setText(location.toString());
                 }
             }
