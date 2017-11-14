@@ -261,9 +261,12 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
         intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
-        alarmManager.cancel(pendingIntent);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent);
+        if(alarm.getRequestCode() != null)
+        {
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
+            alarmManager.cancel(pendingIntent);
+            alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent);
+        }
     }
 
     private int getNextAlarmRequestCode()
@@ -271,10 +274,13 @@ public class MainActivity extends AppCompatActivity {
         int highestRequestCode = 0;
         for(SpaceTimeAlarm alarm : alarmArray)
         {
-            int currentRequestCode = alarm.getRequestCode();
-            if(currentRequestCode > highestRequestCode)
+            if (alarm.getRequestCode() != null)
             {
-                highestRequestCode = currentRequestCode;
+                int currentRequestCode = alarm.getRequestCode();
+                if(currentRequestCode > highestRequestCode)
+                {
+                    highestRequestCode = currentRequestCode;
+                }
             }
         }
         return highestRequestCode+1;
