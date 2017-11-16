@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Space Time Alarm</string>
-
     <!-- TODO: Remove or change this placeholder text -->
     <string name="google_map_key">AIzaSyAyAD-OmHUTKQo0pXh4FVuR-vNELbS2dZM</string>
 </resources>
