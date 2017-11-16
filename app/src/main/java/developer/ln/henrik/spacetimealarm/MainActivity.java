@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -68,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView_Alarms;
     private ArrayList<SpaceTimeAlarm> alarmArray;
     private SpaceTimeAlarmAdapter alarmAdapter;
-    private Button button_NewAlarm;
+    //private Button button_NewAlarm;
+    private FloatingActionButton button_NewAlarm;
 
     private DatabaseReference database;
     private AlarmManager alarmManager;
@@ -178,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                 createOrEditAlarm(alarm);
             }
         });
-        button_NewAlarm = (Button) findViewById(R.id.button_NewAlarm);
+        button_NewAlarm = (FloatingActionButton) findViewById(R.id.button_NewAlarm);
         button_NewAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
