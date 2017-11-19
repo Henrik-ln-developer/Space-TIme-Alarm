@@ -2,7 +2,11 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -30,9 +34,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
+
+import static android.R.attr.defaultValue;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -74,17 +82,31 @@ public class MainActivity extends AppCompatActivity {
     private AlarmManager alarmManager;
     private GeofencingClient geofencingManager;
 
+    private AlarmReceiver alarmReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        registerAlarmBroadcast();
         alarmArray = new ArrayList<>();
         alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, this);
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        database = firebaseDatabase.getReference("alarms");
+
+        SharedPreferences sharedPref = getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
+        String id = sharedPref.getString("APPLICATION_ID", null);
+        if(id == null)
+        {
+            SharedPreferences.Editor editor = sharedPref.edit();
+            DatabaseReference root = firebaseDatabase.getReference();
+            id = root.push().getKey();
+            editor.putString("APPLICATION_ID", id);
+            editor.commit();
+        }
+
+        database = firebaseDatabase.getReference(id + "/alarms");
         database.addChildEventListener(new ChildEventListener() {
 
             @Override
@@ -269,15 +291,20 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAlarm(SpaceTimeAlarm alarm)
     {
-        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
         if(alarm.getRequestCode() != null)
         {
             if(alarm.getStartTime() != null)
             {
+                Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
+                intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
+                intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
                 PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
                 alarmManager.cancel(pendingIntent_Alarm);
                 alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(alarm.getStartTime());
+                String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
+                Log.d("CHECKSTUFF", "Alarm set to: " + timeString);
             }
 
             if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
@@ -336,5 +363,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
         return highestRequestCode+1;
+    }
+
+    private void registerAlarmBroadcast() {
+        alarmReceiver = new AlarmReceiver();
+        registerReceiver(alarmReceiver, new IntentFilter("developer.ln-henrik.spacetimealarm.alarmfilter"));
+    }
+
+    private void unregisterAlarmBroadcast() {
+        getBaseContext().unregisterReceiver(alarmReceiver);
     }
 }

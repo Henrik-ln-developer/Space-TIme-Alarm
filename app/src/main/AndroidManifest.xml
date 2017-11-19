@@ -24,7 +24,10 @@
         </activity>
         <activity android:name=".SpaceTimeAlarmActivity"></activity>
         <service android:name=".GeofenceAlarmReceiver"/>
-
+        <receiver android:name=".AlarmReceiver"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
     </application>
 
 </manifest>

@@ -118,8 +118,7 @@ public class GeofenceAlarmReceiver extends IntentService {
         builder.setAutoCancel(true);
 
         // Get an instance of the Notification manager
-        NotificationManager mNotificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
         // Issue the notification
         mNotificationManager.notify(0, builder.build());
