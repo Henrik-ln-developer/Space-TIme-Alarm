@@ -80,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView_Alarms;
     private ArrayList<SpaceTimeAlarm> alarmArray;
     private SpaceTimeAlarmAdapter alarmAdapter;
-    //private Button button_NewAlarm;
     private FloatingActionButton button_NewAlarm;
 
     private DatabaseReference database;
@@ -297,58 +296,64 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAlarm(SpaceTimeAlarm alarm)
     {
-        if(alarm.getRequestCode() != null)
+        if(alarm.isDone() != null)
         {
-            if(alarm.getStartTime() != null)
+            if(!alarm.isDone())
             {
-                Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-                intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
-                intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
-                alarmManager.cancel(pendingIntent_Alarm);
-                alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
-                Calendar calendar = Calendar.getInstance();
-                calendar.setTimeInMillis(alarm.getStartTime());
-                String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
-                Log.d("CHECKSTUFF", "Alarm set to: " + timeString);
-            }
+                if(alarm.getRequestCode() != null)
+                {
+                    if(alarm.getStartTime() != null)
+                    {
+                        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
+                        intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
+                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
+                        PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
+                        alarmManager.cancel(pendingIntent_Alarm);
+                        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(alarm.getStartTime());
+                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
+                        Log.d("CHECKSTUFF", "Alarm set to: " + timeString);
+                    }
 
-            if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
-            {
-                Intent intent = new Intent(this, GeofenceAlarmReceiver.class);
-                PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
-                GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-                builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-                Geofence geofence = new Geofence.Builder()
-                        .setRequestId(alarm.getId())
-                        .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
-                        .setExpirationDuration(GEOFENCE_EXPIRATION_TIME)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                        .build();
-                ArrayList<Geofence> geofences = new ArrayList<>();
-                geofences.add(geofence);
-                builder.addGeofences(geofences);
-                if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                {
-                    geofencingManager.removeGeofences(pendingIntent_Geofence);
-                    geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
-                            .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Toast.makeText(MainActivity.this, "Location alarm set", Toast.LENGTH_SHORT).show();
-                                }
-                            })
-                            .addOnFailureListener(this, new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Toast.makeText(MainActivity.this, "Failed to set Location alarm", Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                }
-                else
-                {
-                    ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
-                    Toast.makeText(MainActivity.this, "Needs ACCESS_FINE_LOCATION Permission", Toast.LENGTH_SHORT).show();
+                    if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
+                    {
+                        Intent intent = new Intent(this, GeofenceAlarmReceiver.class);
+                        PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+                        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
+                        Geofence geofence = new Geofence.Builder()
+                                .setRequestId(alarm.getId())
+                                .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
+                                .setExpirationDuration(GEOFENCE_EXPIRATION_TIME)
+                                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
+                                .build();
+                        ArrayList<Geofence> geofences = new ArrayList<>();
+                        geofences.add(geofence);
+                        builder.addGeofences(geofences);
+                        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+                        {
+                            geofencingManager.removeGeofences(pendingIntent_Geofence);
+                            geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
+                                    .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                                        @Override
+                                        public void onSuccess(Void aVoid) {
+                                            Toast.makeText(MainActivity.this, "Location alarm set", Toast.LENGTH_SHORT).show();
+                                        }
+                                    })
+                                    .addOnFailureListener(this, new OnFailureListener() {
+                                        @Override
+                                        public void onFailure(@NonNull Exception e) {
+                                            Toast.makeText(MainActivity.this, "Failed to set Location alarm", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                        else
+                        {
+                            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
+                            Toast.makeText(MainActivity.this, "Needs ACCESS_FINE_LOCATION Permission", Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
             }
         }
