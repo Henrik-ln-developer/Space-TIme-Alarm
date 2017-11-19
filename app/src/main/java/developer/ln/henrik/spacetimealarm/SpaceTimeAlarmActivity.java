@@ -40,6 +40,7 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
     private Calendar endTime;
     private String alarm_Id;
     private Integer requestCode;
+    private Boolean done;
 
     private boolean isEdit;
 
@@ -123,6 +124,11 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                 {
                     requestCode = alarm.getRequestCode();
                 }
+
+                if(alarm.isDone() != null)
+                {
+                    done = alarm.isDone();
+                }
             }
             else
             {
@@ -183,6 +189,10 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                     if (requestCode != null)
                     {
                         result_intent.putExtra(MainActivity.EXTRA_REQUESTCODE, requestCode);
+                    }
+                    if(done != null)
+                    {
+                        result_intent.putExtra(MainActivity.EXTRA_DONE, done);
                     }
                     setResult(RESULT_OK, result_intent);
                     finish();

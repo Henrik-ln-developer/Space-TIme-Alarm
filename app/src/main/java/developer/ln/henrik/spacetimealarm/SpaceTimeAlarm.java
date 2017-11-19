@@ -17,11 +17,12 @@ public class SpaceTimeAlarm implements Serializable {
     private Long startTime;
     private Long endTime;
     private Integer requestCode;
+    private Boolean done;
 
     public SpaceTimeAlarm() {
     }
 
-    public SpaceTimeAlarm(String id, String caption, String location_Id, String location_Name, Double location_Lat, Double location_Lng, Integer radius, Long startTime, Long endTime, Integer requestCode) {
+    public SpaceTimeAlarm(String id, String caption, String location_Id, String location_Name, Double location_Lat, Double location_Lng, Integer radius, Long startTime, Long endTime, Integer requestCode, Boolean done) {
         this.id = id;
         this.caption = caption;
         this.location_Id = location_Id;
@@ -32,6 +33,7 @@ public class SpaceTimeAlarm implements Serializable {
         this.startTime = startTime;
         this.endTime = endTime;
         this.requestCode = requestCode;
+        this.done = done;
     }
 
     public String getId() {
@@ -102,6 +104,10 @@ public class SpaceTimeAlarm implements Serializable {
 
     public void setRequestCode(Integer requestCode) { this.requestCode = requestCode; }
 
+    public Boolean isDone() { return done; }
+
+    public void setDone(Boolean done) { this.done = done; }
+
     @Override
     public String toString() {
         return "SpaceTimeAlarm{" +
@@ -115,6 +121,7 @@ public class SpaceTimeAlarm implements Serializable {
                 ", startTime=" + startTime +
                 ", endTime=" + endTime +
                 ", requestCode=" + requestCode +
+                ", done=" + done +
                 '}';
     }
 
@@ -130,6 +137,7 @@ public class SpaceTimeAlarm implements Serializable {
         result.put("startTime", startTime);
         result.put("endTime", endTime);
         result.put("requestCode", requestCode);
+        result.put("done", done);
         return result;
     }
 

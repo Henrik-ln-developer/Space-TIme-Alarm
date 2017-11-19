@@ -42,6 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static android.R.attr.defaultValue;
+import static android.R.attr.id;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -63,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_ALARM_ID = "EXTRA ALARM ID";
     public static final String EXTRA_REQUESTCODE = "EXTRA REQUESTCODE";
     public static final String EXTRA_RADIUS = "EXTRA RADIUS";
+    public static final String EXTRA_DONE = "EXTRA DONE";
+
 
     public static final int REQUEST_CODE_ALARM = 1;
     public static final int REQUEST_CODE_LOCATION = 2;
@@ -92,23 +95,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerAlarmBroadcast();
-        alarmArray = new ArrayList<>();
-        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, this);
+
 
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
         SharedPreferences sharedPref = getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
-        String id = sharedPref.getString("APPLICATION_ID", null);
-        if(id == null)
+        String application_id = sharedPref.getString("APPLICATION_ID", null);
+        if(application_id == null)
         {
             SharedPreferences.Editor editor = sharedPref.edit();
             DatabaseReference root = firebaseDatabase.getReference();
-            id = root.push().getKey();
-            editor.putString("APPLICATION_ID", id);
+            application_id = root.push().getKey();
+            editor.putString("APPLICATION_ID", application_id);
             editor.commit();
         }
-
-        database = firebaseDatabase.getReference(id + "/alarms");
+        alarmArray = new ArrayList<>();
+        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, this, application_id);
+        database = firebaseDatabase.getReference(application_id + "/alarms");
         database.addChildEventListener(new ChildEventListener() {
 
             @Override
@@ -233,19 +236,20 @@ public class MainActivity extends AppCompatActivity {
                 endTime = endTime == 0 ? null : endTime;
                 int alarm_RequestCode = data.getIntExtra(EXTRA_REQUESTCODE, 0);
                 alarm_RequestCode = alarm_RequestCode == 0 ? getNextAlarmRequestCode() : alarm_RequestCode;
+                Boolean done = data.getBooleanExtra(EXTRA_DONE, false);
 
                 if(caption != null && ((location_lat != null && location_lng != null) || startTime != null))
                 {
                     final SpaceTimeAlarm alarm;
                     if(alarm_Id != null)
                     {
-                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode);
+                        alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
                         Log.d("CHECKSTUFF", "Updating alarm with id: " + alarm_Id);
                     }
                     else
                     {
                         String newId = database.push().getKey();
-                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode);
+                        alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
                         Log.d("CHECKSTUFF", "Creating alarm with id: " + newId);
                     }
 
