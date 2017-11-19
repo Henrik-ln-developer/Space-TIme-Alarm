@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -56,6 +57,7 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
         TextView locationName = (TextView) rowView.findViewById(R.id.textView_LocationName);
         TextView time = (TextView) rowView.findViewById(R.id.textView_Time);
         final CheckBox done = (CheckBox) rowView.findViewById(R.id.checkBox_Done);
+        final Button button_Delete = (Button) rowView.findViewById(R.id.button_Delete);
 
         Animation animation = AnimationUtils.loadAnimation(context, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         rowView.startAnimation(animation);
@@ -108,6 +110,12 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
                 updateAlarm(alarm);
             }
         });
+        button_Delete.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deleteAlarm(alarm);
+            }
+        });
 
         return rowView;
     }
@@ -127,5 +135,10 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
                 }
             }
         });
+    }
+
+    private void deleteAlarm(SpaceTimeAlarm alarm)
+    {
+        database.child(alarm.getId()).removeValue();
     }
 }

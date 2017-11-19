@@ -171,7 +171,10 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("CHECKSTUFF", "Checker alarm med ID: " + alarm.getId());
                             if(alarm.getId().equals(deletedAlarm.getId()))
                             {
+                                Log.d("CHECKSTUFF", "Remover alarm med ID: " + alarm.getId());
                                 alarmArray.remove(alarm);
+                                alarmAdapter.notifyDataSetChanged();
+                                return;
                             }
                         }
                         else
