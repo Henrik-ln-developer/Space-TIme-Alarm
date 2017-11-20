@@ -58,7 +58,7 @@ public class GeofenceAlarmReceiver extends IntentService {
             // Get the transition type.
             int geofenceTransition = geofencingEvent.getGeofenceTransition();
             // Test that the reported transition was of interest.
-            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER)
+            if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)
             {
                 // Get the geofences that were triggered.
                 List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();

@@ -110,12 +110,14 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
                 updateAlarm(alarm);
             }
         });
+        done.setFocusable(false);
         button_Delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 deleteAlarm(alarm);
             }
         });
+        button_Delete.setFocusable(false);
 
         return rowView;
     }

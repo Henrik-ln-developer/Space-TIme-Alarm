@@ -23,6 +23,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static developer.ln.henrik.spacetimealarm.MainActivity.EXTRA_ALARM;
+import static developer.ln.henrik.spacetimealarm.MainActivity.EXTRA_EDIT;
+import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_ALARM;
+
 /**
  * Created by Henrik on 20/11/2017.
  */
@@ -53,10 +57,10 @@ public class DatabaseManager implements ChildEventListener
         return instance;
     }
 
-    public void initializeDatabaseManager(Activity activity, ListView listView_Alarms, SpaceTimeAlarmManager alarmManager)
+    public void initializeDatabaseManager(Activity activity, ListView listView_AlarmsReference, SpaceTimeAlarmManager alarmManager)
     {
         this.activity = activity;
-        this.listView_Alarms = listView_Alarms;
+        listView_Alarms = listView_AlarmsReference;
         this.alarmManager = alarmManager;
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         SharedPreferences sharedPref = activity.getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);

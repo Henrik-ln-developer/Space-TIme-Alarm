@@ -71,6 +71,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         manager = new SpaceTimeAlarmManager(this);
         listView_Alarms = (ListView) findViewById(R.id.listView_Alarms) ;
+        databaseManager = DatabaseManager.getInstance();
+        databaseManager.initializeDatabaseManager(this, listView_Alarms, manager);
         listView_Alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -78,8 +80,6 @@ public class MainActivity extends AppCompatActivity {
                 createOrEditAlarm(alarm);
             }
         });
-        databaseManager = DatabaseManager.getInstance();
-        databaseManager.initializeDatabaseManager(this, listView_Alarms, manager);
         button_NewAlarm = (FloatingActionButton) findViewById(R.id.button_NewAlarm);
         button_NewAlarm.setOnClickListener(new View.OnClickListener() {
             @Override
