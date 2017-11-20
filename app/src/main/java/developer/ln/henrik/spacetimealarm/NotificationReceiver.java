@@ -2,8 +2,11 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.os.Bundle;
+import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -20,16 +23,15 @@ import java.util.Map;
  * Created by Henrik on 20/11/2017.
  */
 
-public class NotificationReceiver extends IntentService
+public class NotificationReceiver extends AppCompatActivity
 {
-
-    public NotificationReceiver() {
-        super("NotificationReceiver");
-    }
-
     @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        ByteArrayInputStream bis = new ByteArrayInputStream(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+
+        Log.d("SPACETIMEALARM", "Notification received");
+        ByteArrayInputStream bis = new ByteArrayInputStream(getIntent().getByteArrayExtra(MainActivity.EXTRA_ALARM));
         ObjectInput in = null;
         SpaceTimeAlarm alarm = null;
         try
@@ -37,14 +39,17 @@ public class NotificationReceiver extends IntentService
             in = new ObjectInputStream(bis);
             alarm = (SpaceTimeAlarm)in.readObject();
             alarm.setDone(true);
-            DatabaseManager.getInstance().updateAlarm(alarm);
+            Log.d("SPACETIMEALARM", "Notification's alarm updating to done");
+            DatabaseManager.getInstance().updateAlarm(alarm, this);
         }
         catch (ClassNotFoundException e)
         {
+            Log.d("SPACETIMEALARM", "InputStream threw an ClassNotFoundException");
             e.printStackTrace();
         }
         catch (IOException e)
         {
+            Log.d("SPACETIMEALARM", "InputStream threw an IOException");
             e.printStackTrace();
         }
         finally
@@ -58,6 +63,7 @@ public class NotificationReceiver extends IntentService
             }
             catch (IOException ex)
             {
+                Log.d("SPACETIMEALARM", "Failed to shutdown InputStream");
                 ex.printStackTrace();
             }
         }

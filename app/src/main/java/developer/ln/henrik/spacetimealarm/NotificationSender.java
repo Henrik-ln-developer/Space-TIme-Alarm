@@ -23,7 +23,6 @@ public class NotificationSender {
     public static void sendNotification(Context context, String title, String text, SpaceTimeAlarm alarm) {
         Log.d("SPACETIMEALARM", "Sending notification");
 
-        int mNotificationId = 1;
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(context, NotificationReceiver.class);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -77,7 +76,7 @@ public class NotificationSender {
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // Issue the notification
-        mNotificationManager.notify(mNotificationId, builder.build());
+        mNotificationManager.notify((int)(Math.random()*1000), builder.build());
         Log.d("SPACETIMEALARM", "Notification sent");
     }
 }

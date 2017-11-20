@@ -2,6 +2,7 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -97,6 +98,27 @@ public class DatabaseManager implements ChildEventListener
         });
     }
 
+    public void updateAlarm(SpaceTimeAlarm alarm, Activity activity)
+    {
+        final Activity currentActivity = activity;
+        Map<String, Object> postValues = alarm.toMap();
+        Map<String, Object> childUpdates = new HashMap<>();
+        childUpdates.put("/" + alarm.getId(), postValues);
+        database.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    Log.d("SPACESTOREALARM", "Alarm Saved to database");
+                } else {
+                    Log.d("SPACECHECKSTUFF", task.getException().getMessage().toString());
+                }
+                Intent i = new Intent(currentActivity, MainActivity.class);
+                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                currentActivity.startActivity(i);
+            }
+        });
+    }
+
     public int getNextAlarmRequestCode()
     {
         int highestRequestCode = 0;
@@ -143,8 +165,11 @@ public class DatabaseManager implements ChildEventListener
                         alarm.setLocation_Name(changedAlarm.getLocation_Name());
                         alarm.setLocation_Lat(changedAlarm.getLocation_Lat());
                         alarm.setLocation_Lng(changedAlarm.getLocation_Lng());
+                        alarm.setRadius(changedAlarm.getRadius());
                         alarm.setStartTime(changedAlarm.getStartTime());
                         alarm.setEndTime(changedAlarm.getEndTime());
+                        alarm.setRequestCode(changedAlarm.getRequestCode());
+                        alarm.setDone(changedAlarm.isDone());
                         alarmAdapter.notifyDataSetChanged();
                         alarmManager.setAlarm(alarm);
                         return;
