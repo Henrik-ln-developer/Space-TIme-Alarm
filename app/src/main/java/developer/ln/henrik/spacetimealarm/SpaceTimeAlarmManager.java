@@ -3,14 +3,17 @@ package developer.ln.henrik.spacetimealarm;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.Space;
 import android.util.Log;
+import android.widget.ListView;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -18,6 +21,8 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -29,10 +34,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import static android.R.attr.content;
 import static android.R.attr.data;
 import static android.content.Context.ALARM_SERVICE;
 import static developer.ln.henrik.spacetimealarm.MainActivity.GEOFENCE_EXPIRATION_TIME;
 import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_LOCATION;
+import static developer.ln.henrik.spacetimealarm.R.id.listView_Alarms;
 
 /**
  * Created by Henrik on 20/11/2017.
@@ -40,17 +47,37 @@ import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_
 
 public class SpaceTimeAlarmManager
 {
-    private Activity activity;
+    private static SpaceTimeAlarmManager instance;
+    private static Activity activity;
     private AlarmManager alarmManager;
     private GeofencingClient geofencingManager;
     private TimeAlarmReceiver timeAlarmReceiver;
 
-    public SpaceTimeAlarmManager(Activity activity)
+    private SpaceTimeAlarmManager()
     {
-        this.activity = activity;
+
+    }
+
+    public static SpaceTimeAlarmManager getInstance()
+    {
+        if(instance == null)
+        {
+            instance = new SpaceTimeAlarmManager();
+        }
+        return instance;
+    }
+
+    public void initializeSpaceTimeAlarmManager(Activity activityReference)
+    {
+        activity = activityReference;
         registerAlarmBroadcast();
         alarmManager = (AlarmManager) activity.getSystemService(ALARM_SERVICE);
         geofencingManager = LocationServices.getGeofencingClient(activity);
+    }
+
+    public void destroyinitializeSpaceTimeAlarmManager()
+    {
+        unregisterAlarmBroadcast();
     }
 
     public void setAlarm(SpaceTimeAlarm alarm)
@@ -142,6 +169,11 @@ public class SpaceTimeAlarmManager
         // For Debugging
         String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
         Log.d("SPACESETALARM", "AlarmManager set to: " + timeString);
+    }
+
+    public void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
+    {
+        Log.d("SPACETIMEALARM", "Posponing alarm");
     }
 
     private void registerAlarmBroadcast() {

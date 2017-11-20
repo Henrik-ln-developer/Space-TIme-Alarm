@@ -1,5 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
@@ -67,7 +68,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                             }
                             else
                             {
-                                posponeAlarm(intent, alarm);
+                                SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
                             }
                         }
                         else
@@ -78,7 +79,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                             }
                             else
                             {
-                                posponeAlarm(intent, alarm);
+                                SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
                             }
                         }
                     }
@@ -110,11 +111,6 @@ public class GeofenceAlarmReceiver extends IntentService {
         }
         String triggeringGeofencesIdsString = TextUtils.join(", ",  triggeringGeofencesIdsList);
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
-    }
-
-    private void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
-    {
-        Log.d("SPACEGEOFENCEALARM", "Posponing alarm");
     }
 
     private String getTransitionString(int transitionType) {

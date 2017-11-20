@@ -1,5 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -36,7 +37,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     else
                     {
                         Log.d("SPACETIMEALARM", "StartTime hasn't happened");
-                        posponeAlarm(intent, alarm);
+                        SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
                     }
                 }
                 else
@@ -49,7 +50,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     else
                     {
                         Log.d("TIMEALARM", "Not within time interval");
-                        posponeAlarm(intent, alarm);
+                        SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
                     }
                 }
             }
@@ -64,8 +65,4 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
         }
     }
 
-    private void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
-    {
-        Log.d("SPACETIMEALARM", "Posponing alarm");
-    }
 }

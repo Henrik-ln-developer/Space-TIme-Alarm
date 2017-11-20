@@ -1,5 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -21,41 +22,20 @@ public class NotificationReceiver extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         Log.d("SPACETIMEALARM", "Notification received");
-        ByteArrayInputStream bis = new ByteArrayInputStream(getIntent().getByteArrayExtra(MainActivity.EXTRA_ALARM));
-        ObjectInput in = null;
-        SpaceTimeAlarm alarm = null;
-        try
+        boolean done = getIntent().getBooleanExtra(MainActivity.EXTRA_ALARM_DONE, false);
+        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(getIntent().getByteArrayExtra(MainActivity.EXTRA_ALARM));
+        if(done)
         {
-            in = new ObjectInputStream(bis);
-            alarm = (SpaceTimeAlarm)in.readObject();
             alarm.setDone(true);
-            Log.d("SPACETIMEALARM", "Notification's alarm updating to done");
+            Log.d("SPACETIMEALARM", "Updating alarm to done: " + alarm.toString());
             DatabaseManager.getInstance().updateAlarm(alarm, this);
         }
-        catch (ClassNotFoundException e)
+        else
         {
-            Log.d("SPACETIMEALARM", "InputStream threw an ClassNotFoundException");
-            e.printStackTrace();
+            Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.toString());
+            Intent intent_BackToMain = new Intent(this, MainActivity.class);
+            startActivity(intent_BackToMain);
         }
-        catch (IOException e)
-        {
-            Log.d("SPACETIMEALARM", "InputStream threw an IOException");
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (in != null)
-                {
-                    in.close();
-                }
-            }
-            catch (IOException ex)
-            {
-                Log.d("SPACETIMEALARM", "Failed to shutdown InputStream");
-                ex.printStackTrace();
-            }
-        }
+
     }
 }

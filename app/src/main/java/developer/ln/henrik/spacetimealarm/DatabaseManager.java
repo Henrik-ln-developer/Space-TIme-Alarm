@@ -29,7 +29,6 @@ public class DatabaseManager implements ChildEventListener
 {
     private Activity activity;
     private ListView listView_Alarms;
-    private SpaceTimeAlarmManager alarmManager;
 
     private ArrayList<SpaceTimeAlarm> alarmArray;
     private SpaceTimeAlarmAdapter alarmAdapter;
@@ -51,11 +50,10 @@ public class DatabaseManager implements ChildEventListener
         return instance;
     }
 
-    public void initializeDatabaseManager(Activity activity, ListView listView_AlarmsReference, SpaceTimeAlarmManager alarmManager)
+    public void initializeDatabaseManager(Activity activity, ListView listView_AlarmsReference)
     {
         this.activity = activity;
         listView_Alarms = listView_AlarmsReference;
-        this.alarmManager = alarmManager;
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
         SharedPreferences sharedPref = activity.getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
         String application_id = sharedPref.getString("APPLICATION_ID", null);
@@ -146,7 +144,7 @@ public class DatabaseManager implements ChildEventListener
         {
             alarmArray.add(alarm);
             alarmAdapter.notifyDataSetChanged();
-            alarmManager.setAlarm(alarm);
+            SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
         }
     }
 
@@ -174,7 +172,7 @@ public class DatabaseManager implements ChildEventListener
                         alarm.setRequestCode(changedAlarm.getRequestCode());
                         alarm.setDone(changedAlarm.isDone());
                         alarmAdapter.notifyDataSetChanged();
-                        alarmManager.setAlarm(alarm);
+                        SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
                         return;
                     }
                 }

@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_REQUESTCODE = "EXTRA REQUESTCODE";
     public static final String EXTRA_RADIUS = "EXTRA RADIUS";
     public static final String EXTRA_DONE = "EXTRA DONE";
+    public static final String EXTRA_ALARM_DONE = "EXTRA ALARM DONE";
 
 
     public static final int REQUEST_CODE_ALARM = 1;
@@ -46,17 +47,16 @@ public class MainActivity extends AppCompatActivity {
     private ListView listView_Alarms;
     private FloatingActionButton button_NewAlarm;
 
-    private SpaceTimeAlarmManager manager;
     private DatabaseManager databaseManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        manager = new SpaceTimeAlarmManager(this);
-        listView_Alarms = (ListView) findViewById(R.id.listView_Alarms) ;
+        listView_Alarms = (ListView) findViewById(R.id.listView_Alarms);
+        SpaceTimeAlarmManager.getInstance().initializeSpaceTimeAlarmManager(this);
         databaseManager = DatabaseManager.getInstance();
-        databaseManager.initializeDatabaseManager(this, listView_Alarms, manager);
+        databaseManager.initializeDatabaseManager(this, listView_Alarms);
         listView_Alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -71,6 +71,12 @@ public class MainActivity extends AppCompatActivity {
                 createOrEditAlarm(null);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SpaceTimeAlarmManager.getInstance().destroyinitializeSpaceTimeAlarmManager();
     }
 
     @Override
