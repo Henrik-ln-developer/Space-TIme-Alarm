@@ -20,37 +20,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("SPACETIMEALARM", "Received TimeAlarm");
-        ByteArrayInputStream bis = new ByteArrayInputStream(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
-        ObjectInput in = null;
-        SpaceTimeAlarm alarm = null;
-        try
-        {
-            in = new ObjectInputStream(bis);
-            alarm = (SpaceTimeAlarm)in.readObject();
-        }
-        catch (ClassNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                if (in != null)
-                {
-                    in.close();
-                }
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
-
+        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
         if(alarm != null)
         {
             if(alarm.getStartTime() != null)

@@ -53,36 +53,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                 // Get the transition details as a String.
                 String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition, triggeringGeofences);
                 Log.d("SPACEGEOFENCEALARM", geofenceTransitionDetails);
-                ByteArrayInputStream bis = new ByteArrayInputStream(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
-                ObjectInput in = null;
-                SpaceTimeAlarm alarm = null;
-                try
-                {
-                    in = new ObjectInputStream(bis);
-                    alarm = (SpaceTimeAlarm)in.readObject();
-                }
-                catch (ClassNotFoundException e)
-                {
-                    e.printStackTrace();
-                }
-                catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
-                finally
-                {
-                    try
-                    {
-                        if (in != null)
-                        {
-                            in.close();
-                        }
-                    }
-                    catch (IOException ex)
-                    {
-                        ex.printStackTrace();
-                    }
-                }
+                SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
                 if (alarm != null)
                 {
                     if(alarm.getStartTime() != null)

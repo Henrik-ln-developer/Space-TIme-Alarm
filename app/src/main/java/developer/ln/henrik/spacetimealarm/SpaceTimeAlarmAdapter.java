@@ -1,8 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,16 +11,9 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 
 
 /**
@@ -34,14 +25,11 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
     private ArrayList<SpaceTimeAlarm> dataSet;
     private Context context;
     private int lastPosition = -1;
-    private DatabaseReference database;
 
-    public SpaceTimeAlarmAdapter(ArrayList<SpaceTimeAlarm> data, Context context, String application_Id) {
+    public SpaceTimeAlarmAdapter(ArrayList<SpaceTimeAlarm> data, Context context) {
         super(context, R.layout.space_time_alarm_row, data);
         this.dataSet = data;
         this.context=context;
-        FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        database = firebaseDatabase.getReference(application_Id + "/alarms");
     }
 
     @Override
@@ -104,14 +92,14 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
                 {
                     alarm.setDone(false);
                 }
-                updateAlarm(alarm);
+                DatabaseManager.getInstance().updateAlarm(alarm);
             }
         });
         done.setFocusable(false);
         button_Delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                deleteAlarm(alarm);
+                DatabaseManager.getInstance().deleteAlarm(alarm);
             }
         });
         button_Delete.setFocusable(false);
@@ -119,25 +107,5 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
         return rowView;
     }
 
-    private void updateAlarm(SpaceTimeAlarm alarm)
-    {
-        Map<String, Object> postValues = alarm.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/" + alarm.getId(), postValues);
-        database.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d("SPACEADAPTER", "Alarm Saved");
-                } else {
-                    Log.d("SPACEADAPTER", task.getException().getMessage().toString());
-                }
-            }
-        });
-    }
 
-    private void deleteAlarm(SpaceTimeAlarm alarm)
-    {
-        database.child(alarm.getId()).removeValue();
-    }
 }

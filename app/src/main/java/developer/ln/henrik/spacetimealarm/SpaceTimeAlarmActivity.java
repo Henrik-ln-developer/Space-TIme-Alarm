@@ -51,11 +51,6 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
     private TextView textView_EndTimeChoose;
     private Button button_Finish;
 
-    private GoogleMap mMap;
-
-    private static final int REQUEST_LOCATION = 1;
-    LocationManager locationManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

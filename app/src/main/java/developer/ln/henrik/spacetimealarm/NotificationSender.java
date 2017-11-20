@@ -15,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import static developer.ln.henrik.spacetimealarm.SpaceTimeAlarmManager.getAlarmByteArray;
+
 /**
  * Created by Henrik on 20/11/2017.
  */
@@ -25,31 +27,8 @@ public class NotificationSender {
 
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(context, NotificationReceiver.class);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream out = null;
-        try
-        {
-            out = new ObjectOutputStream(bos);
-            out.writeObject(alarm);
-            out.flush();
-            byte[] data = bos.toByteArray();
-            notificationIntent.putExtra(MainActivity.EXTRA_ALARM, data);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try
-            {
-                bos.close();
-            }
-            catch (IOException ex)
-            {
-                ex.printStackTrace();
-            }
-        }
+        notificationIntent.putExtra(MainActivity.EXTRA_ALARM, SpaceTimeAlarmManager.getAlarmByteArray(alarm));
+
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
         // Add the main Activity to the task stack as the parent.

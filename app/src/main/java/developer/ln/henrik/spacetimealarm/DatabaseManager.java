@@ -68,7 +68,7 @@ public class DatabaseManager implements ChildEventListener
             editor.commit();
         }
         alarmArray = new ArrayList<>();
-        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, activity, application_id);
+        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, activity);
         database = firebaseDatabase.getReference(application_id + "/alarms");
         database.addChildEventListener(this);
         listView_Alarms.setAdapter(alarmAdapter);
@@ -77,6 +77,11 @@ public class DatabaseManager implements ChildEventListener
     public String getNewAlarmID()
     {
         return database.push().getKey();
+    }
+
+    public void deleteAlarm(SpaceTimeAlarm alarm)
+    {
+        database.child(alarm.getId()).removeValue();
     }
 
     public void updateAlarm(SpaceTimeAlarm alarm)
