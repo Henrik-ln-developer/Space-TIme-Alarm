@@ -95,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
 
         registerAlarmBroadcast();
 
-
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
         SharedPreferences sharedPref = getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
@@ -301,30 +300,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void setAlarm(SpaceTimeAlarm alarm)
     {
+        Log.d("SETALARM", "Setting " + alarm.toString());
         if(alarm.isDone() != null)
         {
             if(!alarm.isDone())
             {
                 if(alarm.getRequestCode() != null)
                 {
-                    if(alarm.getStartTime() != null)
-                    {
-                        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-                        intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
-                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                        PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
-                        alarmManager.cancel(pendingIntent_Alarm);
-                        alarmManager.set(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(alarm.getStartTime());
-                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
-                        Log.d("CHECKSTUFF", "Alarm set to: " + timeString);
-                    }
-
                     if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
                     {
-                        Intent intent = new Intent(this, GeofenceAlarmReceiver.class);
-                        PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                        Intent intent_SetAlarm = new Intent(MainActivity.this, GeofenceAlarmReceiver.class);
+                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
+                        PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
                         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
                         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
                         Geofence geofence = new Geofence.Builder()
@@ -345,18 +332,48 @@ public class MainActivity extends AppCompatActivity {
                                 .addOnSuccessListener(this, new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void aVoid) {
-                                        Log.d("CHECKSTUFF", "Location alarm set");
+                                        Log.d("SETALARM", "Location alarm set");
                                     }
                                 })
                                 .addOnFailureListener(this, new OnFailureListener() {
                                     @Override
                                     public void onFailure(@NonNull Exception e) {
-                                        Log.d("CHECKSTUFF", "Failed to set Location alarm");
+                                        Log.d("SETALARM", "Failed to set Location alarm - " + e.toString());
                                     }
                                 });
                     }
+                    else if(alarm.getStartTime() != null)
+                    {
+                        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
+                        intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
+                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
+                        PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
+                        alarmManager.cancel(pendingIntent_Alarm);
+                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeInMillis(alarm.getStartTime());
+                        // For Debugging
+                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
+                        Log.d("SETALARM", "AlarmManager set to: " + timeString);
+                    }
+                    else
+                    {
+                        Log.d("SETALARM", "Couldn't set alarm. Insufficient information");
+                    }
+                }
+                else
+                {
+                    Log.d("SETALARM", "Couldn't set alarm. No requst code");
                 }
             }
+            else
+            {
+                Log.d("SETALARM", "Couldn't set alarm. Alarm already done");
+            }
+        }
+        else
+        {
+            Log.d("SETALARM", "Couldn't set alarm. No done information");
         }
     }
 
