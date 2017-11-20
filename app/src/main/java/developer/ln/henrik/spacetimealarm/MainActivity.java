@@ -154,7 +154,8 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("CHECKSTUFF", "Ingen ID på alarm");
                         }
                     }
-                    Toast.makeText(getApplicationContext(), "Couldn't find alarm in list", Toast.LENGTH_SHORT).show();
+                    Log.d("CHECKSTUFF", "Alarm changed in database, but hasn't been changed in list");
+                    Toast.makeText(getApplicationContext(), "Alarm changed in database, but hasn't been changed in list", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -182,7 +183,8 @@ public class MainActivity extends AppCompatActivity {
                             Log.d("CHECKSTUFF", "Ingen ID på alarm");
                         }
                     }
-                    Toast.makeText(getApplicationContext(), "Couldn't find alarm in list", Toast.LENGTH_SHORT).show();
+                    Log.d("CHECKSTUFF", "Alarm removed from database, but hasn't been removed from list");
+                    Toast.makeText(getApplicationContext(), "Alarm removed from database, but hasn't been removed from list", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -262,21 +264,21 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Toast.makeText(getApplicationContext(), "Alarm Saved", Toast.LENGTH_SHORT).show();
+                                Log.d("CHECKSTUFF", "Alarm Saved to database");
                             } else {
-                                Toast.makeText(getApplicationContext(), "" + task.getException().getMessage().toString(), Toast.LENGTH_SHORT).show();
+                                Log.d("CHECKSTUFF", task.getException().getMessage().toString());
                             }
                         }
                     });
                 }
                 else
                 {
-                    Toast.makeText(MainActivity.this, "An error occured", Toast.LENGTH_SHORT).show();
+                    Log.d("CHECKSTUFF", "An error occured");
                 }
             }
             else
             {
-                Toast.makeText(MainActivity.this, "An error occured", Toast.LENGTH_SHORT).show();
+                Log.d("CHECKSTUFF", "An error occured - Result Not OK");
             }
         }
     }
@@ -336,26 +338,22 @@ public class MainActivity extends AppCompatActivity {
                         builder.addGeofences(geofences);
                         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
                         {
-                            geofencingManager.removeGeofences(pendingIntent_Geofence);
-                            geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
-                                    .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                                        @Override
-                                        public void onSuccess(Void aVoid) {
-                                            Toast.makeText(MainActivity.this, "Location alarm set", Toast.LENGTH_SHORT).show();
-                                        }
-                                    })
-                                    .addOnFailureListener(this, new OnFailureListener() {
-                                        @Override
-                                        public void onFailure(@NonNull Exception e) {
-                                            Toast.makeText(MainActivity.this, "Failed to set Location alarm", Toast.LENGTH_SHORT).show();
-                                        }
-                                    });
-                        }
-                        else
-                        {
                             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
-                            Toast.makeText(MainActivity.this, "Needs ACCESS_FINE_LOCATION Permission", Toast.LENGTH_SHORT).show();
                         }
+                        geofencingManager.removeGeofences(pendingIntent_Geofence);
+                        geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
+                                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        Log.d("CHECKSTUFF", "Location alarm set");
+                                    }
+                                })
+                                .addOnFailureListener(this, new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Log.d("CHECKSTUFF", "Failed to set Location alarm");
+                                    }
+                                });
                     }
                 }
             }
