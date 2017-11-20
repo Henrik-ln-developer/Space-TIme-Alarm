@@ -83,8 +83,7 @@ public class MainActivity extends AppCompatActivity {
     private FloatingActionButton button_NewAlarm;
 
     private DatabaseReference database;
-    private AlarmManager alarmManager;
-    private GeofencingClient geofencingManager;
+    private SpaceTimeAlarmManager manager;
 
     private AlarmReceiver alarmReceiver;
 
@@ -94,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         registerAlarmBroadcast();
-
+        manager = new SpaceTimeAlarmManager(this);
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
 
         SharedPreferences sharedPref = getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
                 {
                     alarmArray.add(alarm);
                     alarmAdapter.notifyDataSetChanged();
-                    setAlarm(alarm);
+                    manager.setAlarm(alarm);
                 }
             }
 
@@ -128,12 +127,12 @@ public class MainActivity extends AppCompatActivity {
                 SpaceTimeAlarm changedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
                 if(changedAlarm != null)
                 {
-                    Log.d("CHECKSTUFF", "Leder efter alarm med ID: " + changedAlarm.getId());
+                    Log.d("SPACECHANGEDALARM", "Leder efter alarm med ID: " + changedAlarm.getId());
                     for(SpaceTimeAlarm alarm : alarmArray)
                     {
                         if(alarm.getId() != null)
                         {
-                            Log.d("CHECKSTUFF", "Checker alarm med ID: " + alarm.getId());
+                            Log.d("SPACECHANGEDALARM", "Checker alarm med ID: " + alarm.getId());
                             if(alarm.getId().equals(changedAlarm.getId()))
                             {
                                 alarm.setCaption(changedAlarm.getCaption());
@@ -144,16 +143,16 @@ public class MainActivity extends AppCompatActivity {
                                 alarm.setStartTime(changedAlarm.getStartTime());
                                 alarm.setEndTime(changedAlarm.getEndTime());
                                 alarmAdapter.notifyDataSetChanged();
-                                setAlarm(alarm);
+                                manager.setAlarm(alarm);
                                 return;
                             }
                         }
                         else
                         {
-                            Log.d("CHECKSTUFF", "Ingen ID på alarm");
+                            Log.d("SPACECHANGEDALARM", "Ingen ID på alarm");
                         }
                     }
-                    Log.d("CHECKSTUFF", "Alarm changed in database, but hasn't been changed in list");
+                    Log.d("SPACECHANGEDALARM", "Alarm changed in database, but hasn't been changed in list");
                     Toast.makeText(getApplicationContext(), "Alarm changed in database, but hasn't been changed in list", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -163,15 +162,15 @@ public class MainActivity extends AppCompatActivity {
                 SpaceTimeAlarm deletedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
                 if(deletedAlarm != null)
                 {
-                    Log.d("CHECKSTUFF", "Leder efter alarm med ID: " + deletedAlarm.getId());
+                    Log.d("SPACEREMOVEDALARM", "Leder efter alarm med ID: " + deletedAlarm.getId());
                     for(SpaceTimeAlarm alarm : alarmArray)
                     {
                         if(alarm.getId() != null)
                         {
-                            Log.d("CHECKSTUFF", "Checker alarm med ID: " + alarm.getId());
+                            Log.d("SPACEREMOVEDALARM", "Checker alarm med ID: " + alarm.getId());
                             if(alarm.getId().equals(deletedAlarm.getId()))
                             {
-                                Log.d("CHECKSTUFF", "Remover alarm med ID: " + alarm.getId());
+                                Log.d("SPACEREMOVEDALARM", "Remover alarm med ID: " + alarm.getId());
                                 alarmArray.remove(alarm);
                                 alarmAdapter.notifyDataSetChanged();
                                 return;
@@ -179,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                         else
                         {
-                            Log.d("CHECKSTUFF", "Ingen ID på alarm");
+                            Log.d("SPACEREMOVEDALARM", "Ingen ID på alarm");
                         }
                     }
-                    Log.d("CHECKSTUFF", "Alarm removed from database, but hasn't been removed from list");
+                    Log.d("SPACEREMOVEDALARM", "Alarm removed from database, but hasn't been removed from list");
                     Toast.makeText(getApplicationContext(), "Alarm removed from database, but hasn't been removed from list", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -197,8 +196,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
-        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        geofencingManager = LocationServices.getGeofencingClient(this);
         listView_Alarms = (ListView) findViewById(R.id.listView_Alarms) ;
         listView_Alarms.setAdapter(alarmAdapter);
         listView_Alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -247,13 +244,13 @@ public class MainActivity extends AppCompatActivity {
                     if(alarm_Id != null)
                     {
                         alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
-                        Log.d("CHECKSTUFF", "Updating alarm with id: " + alarm_Id);
+                        Log.d("SPACESTOREALARM", "Updating alarm with id: " + alarm_Id);
                     }
                     else
                     {
                         String newId = database.push().getKey();
                         alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
-                        Log.d("CHECKSTUFF", "Creating alarm with id: " + newId);
+                        Log.d("SPACESTOREALARM", "Creating alarm with id: " + newId);
                     }
 
                     Map<String, Object> postValues = alarm.toMap();
@@ -263,21 +260,21 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if (task.isSuccessful()) {
-                                Log.d("CHECKSTUFF", "Alarm Saved to database");
+                                Log.d("SPACESTOREALARM", "Alarm Saved to database");
                             } else {
-                                Log.d("CHECKSTUFF", task.getException().getMessage().toString());
+                                Log.d("SPACECHECKSTUFF", task.getException().getMessage().toString());
                             }
                         }
                     });
                 }
                 else
                 {
-                    Log.d("CHECKSTUFF", "An error occured");
+                    Log.d("SPACESTOREALARM", "An error occured");
                 }
             }
             else
             {
-                Log.d("CHECKSTUFF", "An error occured - Result Not OK");
+                Log.d("SPACESTOREALARM", "An error occured - Result Not OK");
             }
         }
     }
@@ -298,84 +295,7 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent_CreateOrEditAlarm, REQUEST_CODE_ALARM);
     }
 
-    private void setAlarm(SpaceTimeAlarm alarm)
-    {
-        Log.d("SETALARM", "Setting " + alarm.toString());
-        if(alarm.isDone() != null)
-        {
-            if(!alarm.isDone())
-            {
-                if(alarm.getRequestCode() != null)
-                {
-                    if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
-                    {
-                        Intent intent_SetAlarm = new Intent(MainActivity.this, GeofenceAlarmReceiver.class);
-                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                        PendingIntent pendingIntent_Geofence = PendingIntent.getService(this, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
-                        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-                        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
-                        Geofence geofence = new Geofence.Builder()
-                                .setRequestId(alarm.getId())
-                                .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
-                                .setExpirationDuration(GEOFENCE_EXPIRATION_TIME)
-                                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER)
-                                .build();
-                        ArrayList<Geofence> geofences = new ArrayList<>();
-                        geofences.add(geofence);
-                        builder.addGeofences(geofences);
-                        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                        {
-                            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
-                        }
-                        geofencingManager.removeGeofences(pendingIntent_Geofence);
-                        geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
-                                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                                    @Override
-                                    public void onSuccess(Void aVoid) {
-                                        Log.d("SETALARM", "Location alarm set");
-                                    }
-                                })
-                                .addOnFailureListener(this, new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-                                        Log.d("SETALARM", "Failed to set Location alarm - " + e.toString());
-                                    }
-                                });
-                    }
-                    else if(alarm.getStartTime() != null)
-                    {
-                        Intent intent_SetAlarm = new Intent(MainActivity.this, AlarmReceiver.class);
-                        intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
-                        intent_SetAlarm.putExtra(EXTRA_ALARM, alarm);
-                        PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(MainActivity.this, alarm.getRequestCode(), intent_SetAlarm, 0);
-                        alarmManager.cancel(pendingIntent_Alarm);
-                        alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
-                        Calendar calendar = Calendar.getInstance();
-                        calendar.setTimeInMillis(alarm.getStartTime());
-                        // For Debugging
-                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
-                        Log.d("SETALARM", "AlarmManager set to: " + timeString);
-                    }
-                    else
-                    {
-                        Log.d("SETALARM", "Couldn't set alarm. Insufficient information");
-                    }
-                }
-                else
-                {
-                    Log.d("SETALARM", "Couldn't set alarm. No requst code");
-                }
-            }
-            else
-            {
-                Log.d("SETALARM", "Couldn't set alarm. Alarm already done");
-            }
-        }
-        else
-        {
-            Log.d("SETALARM", "Couldn't set alarm. No done information");
-        }
-    }
+
 
     private int getNextAlarmRequestCode()
     {

@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
@@ -40,13 +41,14 @@ public class GeofenceAlarmReceiver extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
+        Log.d("SPACEGEOFENCEALARM", "Received LocationAlarm");
         if(intent != null)
         {
             GeofencingEvent geofencingEvent = GeofencingEvent.fromIntent(intent);
             if (geofencingEvent.hasError())
             {
                 String errorMessage = getErrorString(this, geofencingEvent.getErrorCode());
-                Log.d("GEOFENCEALARM", errorMessage);
+                Log.d("SPACEGEOFENCEALARM", errorMessage);
                 return;
             }
             // Get the transition type.
@@ -58,8 +60,9 @@ public class GeofenceAlarmReceiver extends IntentService {
                 List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
                 // Get the transition details as a String.
                 String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition, triggeringGeofences);
-                Log.d("GEOFENCEALARM", geofenceTransitionDetails);
-                SpaceTimeAlarm alarm = (SpaceTimeAlarm) intent.getSerializableExtra(MainActivity.EXTRA_ALARM);
+                Log.d("SPACEGEOFENCEALARM", geofenceTransitionDetails);
+                Bundle extras = intent.getExtras();
+                SpaceTimeAlarm alarm = (SpaceTimeAlarm) extras.getSerializable(MainActivity.EXTRA_ALARM);
                 if (alarm != null)
                 {
                     if(alarm.getStartTime() != null)
@@ -69,7 +72,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime())
                             {
-                                sendNotification(geofenceTransitionDetails);
+                                SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
                             }
                             else
                             {
@@ -80,7 +83,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime() && currentTime.getTimeInMillis() < alarm.getEndTime())
                             {
-                                sendNotification(geofenceTransitionDetails);
+                                SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
                             }
                             else
                             {
@@ -90,17 +93,17 @@ public class GeofenceAlarmReceiver extends IntentService {
                     }
                     else
                     {
-                        sendNotification(geofenceTransitionDetails);
+                        SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
                     }
                 }
                 else
                 {
-                    Log.d("GEOFENCEALARM", "Alarm is null");
+                    Log.d("SPACEGEOFENCEALARM", "Alarm is null");
                 }
             }
             else
             {
-                Log.d("GEOFENCEALARM", "Invalid Geofence Transition Type");
+                Log.d("SPACEGEOFENCEALARM", "Invalid Geofence Transition Type - " +  geofenceTransition);
             }
         }
     }
@@ -118,45 +121,9 @@ public class GeofenceAlarmReceiver extends IntentService {
         return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
     }
 
-    private void sendNotification(String notificationDetails) {
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getApplicationContext(), MainActivity.class);
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MainActivity.class);
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_launcher))
-                .setColor(Color.RED)
-                .setContentTitle(notificationDetails)
-                .setContentText("Transition notification")
-                .setContentIntent(notificationPendingIntent);
-
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        // Issue the notification
-        mNotificationManager.notify(0, builder.build());
-
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        Ringtone ringtone = RingtoneManager.getRingtone(getApplicationContext(), uri);
-        ringtone.play();
-    }
-
     private void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
     {
-        Log.d("GEOFENCEALARM", "Posponing alarm");
+        Log.d("SPACEGEOFENCEALARM", "Posponing alarm");
     }
 
     private String getTransitionString(int transitionType) {

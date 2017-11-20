@@ -11,8 +11,15 @@ import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
+import java.util.Calendar;
 
 
 /**
@@ -22,54 +29,83 @@ import android.util.Log;
 public class AlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        Log.d("CHECKSTUFF", "Received alarm");
-        sendNotification(context);
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
-        ringtone.play();
-        Log.d("CHECKSTUFF", "Ringtone played");
+        Log.d("SPACETIMEALARM", "Received TimeAlarm");
+        ByteArrayInputStream bis = new ByteArrayInputStream(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
+        ObjectInput in = null;
+        SpaceTimeAlarm alarm = null;
+        try
+        {
+            in = new ObjectInputStream(bis);
+            alarm = (SpaceTimeAlarm)in.readObject();
+        }
+        catch (ClassNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                if (in != null)
+                {
+                    in.close();
+                }
+            }
+            catch (IOException ex)
+            {
+                ex.printStackTrace();
+            }
+        }
+
+        if(alarm != null)
+        {
+            if(alarm.getStartTime() != null)
+            {
+                Calendar currentTime = Calendar.getInstance();
+                if(alarm.getEndTime() == null)
+                {
+                    if(currentTime.getTimeInMillis() > alarm.getStartTime())
+                    {
+                        Log.d("SPACETIMEALARM", "StartTime happened");
+                        SpaceTimeAlarmManager.sendNotification(context, alarm.getCaption());
+                    }
+                    else
+                    {
+                        Log.d("SPACETIMEALARM", "StartTime hasn't happened");
+                        posponeAlarm(intent, alarm);
+                    }
+                }
+                else
+                {
+                    if(currentTime.getTimeInMillis() > alarm.getStartTime() && currentTime.getTimeInMillis() < alarm.getEndTime())
+                    {
+                        Log.d("SPACETIMEALARM", "Within time interval");
+                        SpaceTimeAlarmManager.sendNotification(context, alarm.getCaption());
+                    }
+                    else
+                    {
+                        Log.d("TIMEALARM", "Not within time interval");
+                        posponeAlarm(intent, alarm);
+                    }
+                }
+            }
+            else
+            {
+                Log.d("SPACETIMEALARM", "StartTime is null");
+            }
+        }
+        else
+        {
+            Log.d("SPACETIMEALARM", "Alarm is null");
+        }
     }
 
-    private void sendNotification(Context context) {
-        Log.d("CHECKSTUFF", "Sending notification");
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MainActivity.class);
-
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.ic_launcher))
-                .setColor(Color.RED)
-                .setContentTitle("AMG alarm")
-                .setContentText("Transition notification")
-                .setContentIntent(notificationPendingIntent);
-
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Issue the notification
-        mNotificationManager.notify(0, builder.build());
-        Log.d("CHECKSTUFF", "Notification sent");
+    private void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
+    {
+        Log.d("SPACETIMEALARM", "Posponing alarm");
     }
 }

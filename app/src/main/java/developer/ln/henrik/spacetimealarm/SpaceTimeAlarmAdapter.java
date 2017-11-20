@@ -129,9 +129,9 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d("CHECKSTUFF", "Alarm Saved");
+                    Log.d("SPACEADAPTER", "Alarm Saved");
                 } else {
-                    Log.d("CHECKSTUFF", task.getException().getMessage().toString());
+                    Log.d("SPACEADAPTER", task.getException().getMessage().toString());
                 }
             }
         });
