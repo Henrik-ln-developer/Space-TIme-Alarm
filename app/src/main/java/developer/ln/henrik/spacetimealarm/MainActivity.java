@@ -1,33 +1,20 @@
 package developer.ln.henrik.spacetimealarm;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
-import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -35,14 +22,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
-
-import static android.R.attr.defaultValue;
-import static android.R.attr.id;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -85,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference database;
     private SpaceTimeAlarmManager manager;
 
-    private AlarmReceiver alarmReceiver;
+    private TimeAlarmReceiver alarmReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -315,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void registerAlarmBroadcast() {
-        alarmReceiver = new AlarmReceiver();
+        alarmReceiver = new TimeAlarmReceiver();
         registerReceiver(alarmReceiver, new IntentFilter("developer.ln-henrik.spacetimealarm.alarmfilter"));
     }
 

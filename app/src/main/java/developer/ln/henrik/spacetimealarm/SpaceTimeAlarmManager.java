@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.NotificationCompat;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.Context.ALARM_SERVICE;
-import static developer.ln.henrik.spacetimealarm.MainActivity.EXTRA_ALARM;
 import static developer.ln.henrik.spacetimealarm.MainActivity.GEOFENCE_EXPIRATION_TIME;
 import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_LOCATION;
 
@@ -209,7 +207,7 @@ public class SpaceTimeAlarmManager
 
     private  void setTimeAlarm(SpaceTimeAlarm alarm)
     {
-        Intent intent_SetAlarm = new Intent(activity, AlarmReceiver.class);
+        Intent intent_SetAlarm = new Intent(activity, TimeAlarmReceiver.class);
         intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
         if(alarm != null)
         {

@@ -26,7 +26,7 @@ import java.util.Calendar;
  * Created by Henrik on 07/11/2017.
  */
 
-public class AlarmReceiver extends BroadcastReceiver {
+public class TimeAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("SPACETIMEALARM", "Received TimeAlarm");
