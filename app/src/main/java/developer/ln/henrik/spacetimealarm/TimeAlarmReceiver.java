@@ -71,7 +71,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     if(currentTime.getTimeInMillis() > alarm.getStartTime())
                     {
                         Log.d("SPACETIMEALARM", "StartTime happened");
-                        SpaceTimeAlarmManager.sendNotification(context, alarm.getCaption());
+                        NotificationSender.sendNotification(context, "Time Alarm" , alarm.getCaption(), alarm);
                     }
                     else
                     {
@@ -84,7 +84,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     if(currentTime.getTimeInMillis() > alarm.getStartTime() && currentTime.getTimeInMillis() < alarm.getEndTime())
                     {
                         Log.d("SPACETIMEALARM", "Within time interval");
-                        SpaceTimeAlarmManager.sendNotification(context, alarm.getCaption());
+                        NotificationSender.sendNotification(context, "Time Alarm", alarm.getCaption(), alarm);
                     }
                     else
                     {

@@ -9,6 +9,7 @@ import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -49,49 +50,14 @@ public class SpaceTimeAlarmManager
     private Activity activity;
     private AlarmManager alarmManager;
     private GeofencingClient geofencingManager;
+    private TimeAlarmReceiver timeAlarmReceiver;
 
     public SpaceTimeAlarmManager(Activity activity)
     {
         this.activity = activity;
+        registerAlarmBroadcast();
         alarmManager = (AlarmManager) activity.getSystemService(ALARM_SERVICE);
         geofencingManager = LocationServices.getGeofencingClient(activity);
-    }
-
-    public static void sendNotification(Context context, String caption) {
-        Log.d("SPACETIMEALARM", "Sending notification");
-
-        int mNotificationId = 1;
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(context, MainActivity.class);
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(MainActivity.class);
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
-                        R.drawable.ic_launcher))
-                .setColor(Color.GREEN)
-                .setContentTitle(caption)
-                .setContentText(caption)
-                .setAutoCancel(true)
-                .setLights(Color.RED, 1000, 500)
-                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
-                .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
-                .setContentIntent(notificationPendingIntent);
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // Issue the notification
-        mNotificationManager.notify(mNotificationId, builder.build());
-        Log.d("SPACETIMEALARM", "Notification sent");
     }
 
     public void setAlarm(SpaceTimeAlarm alarm)
@@ -245,5 +211,14 @@ public class SpaceTimeAlarmManager
         // For Debugging
         String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
         Log.d("SPACESETALARM", "AlarmManager set to: " + timeString);
+    }
+
+    private void registerAlarmBroadcast() {
+        timeAlarmReceiver = new TimeAlarmReceiver();
+        activity.registerReceiver(timeAlarmReceiver, new IntentFilter("developer.ln-henrik.spacetimealarm.alarmfilter"));
+    }
+
+    private void unregisterAlarmBroadcast() {
+        activity.getBaseContext().unregisterReceiver(timeAlarmReceiver);
     }
 }

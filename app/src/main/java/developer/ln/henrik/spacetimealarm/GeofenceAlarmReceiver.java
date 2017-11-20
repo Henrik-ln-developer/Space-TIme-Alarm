@@ -23,6 +23,10 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -61,8 +65,36 @@ public class GeofenceAlarmReceiver extends IntentService {
                 // Get the transition details as a String.
                 String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition, triggeringGeofences);
                 Log.d("SPACEGEOFENCEALARM", geofenceTransitionDetails);
-                Bundle extras = intent.getExtras();
-                SpaceTimeAlarm alarm = (SpaceTimeAlarm) extras.getSerializable(MainActivity.EXTRA_ALARM);
+                ByteArrayInputStream bis = new ByteArrayInputStream(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
+                ObjectInput in = null;
+                SpaceTimeAlarm alarm = null;
+                try
+                {
+                    in = new ObjectInputStream(bis);
+                    alarm = (SpaceTimeAlarm)in.readObject();
+                }
+                catch (ClassNotFoundException e)
+                {
+                    e.printStackTrace();
+                }
+                catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+                finally
+                {
+                    try
+                    {
+                        if (in != null)
+                        {
+                            in.close();
+                        }
+                    }
+                    catch (IOException ex)
+                    {
+                        ex.printStackTrace();
+                    }
+                }
                 if (alarm != null)
                 {
                     if(alarm.getStartTime() != null)
@@ -72,7 +104,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime())
                             {
-                                SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
+                                NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
                             }
                             else
                             {
@@ -83,7 +115,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime() && currentTime.getTimeInMillis() < alarm.getEndTime())
                             {
-                                SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
+                                NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
                             }
                             else
                             {
@@ -93,7 +125,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                     }
                     else
                     {
-                        SpaceTimeAlarmManager.sendNotification(this, alarm.getCaption());
+                        NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
                     }
                 }
                 else
