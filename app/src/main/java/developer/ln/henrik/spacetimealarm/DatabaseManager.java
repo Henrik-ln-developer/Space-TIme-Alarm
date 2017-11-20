@@ -6,8 +6,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
-import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -22,10 +20,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static developer.ln.henrik.spacetimealarm.MainActivity.EXTRA_ALARM;
-import static developer.ln.henrik.spacetimealarm.MainActivity.EXTRA_EDIT;
-import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_ALARM;
 
 /**
  * Created by Henrik on 20/11/2017.
