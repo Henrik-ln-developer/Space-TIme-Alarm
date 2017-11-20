@@ -2,6 +2,8 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TaskStackBuilder;
@@ -34,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import static android.content.Context.ALARM_SERVICE;
+import static android.os.Build.VERSION_CODES.M;
 import static developer.ln.henrik.spacetimealarm.MainActivity.GEOFENCE_EXPIRATION_TIME;
 import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_LOCATION;
 
@@ -56,47 +59,39 @@ public class SpaceTimeAlarmManager
 
     public static void sendNotification(Context context, String caption) {
         Log.d("SPACETIMEALARM", "Sending notification");
+
+        int mNotificationId = 1;
         // Create an explicit content Intent that starts the main Activity.
         Intent notificationIntent = new Intent(context, MainActivity.class);
-
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-
         // Add the main Activity to the task stack as the parent.
         stackBuilder.addParentStack(MainActivity.class);
-
         // Push the content Intent onto the stack.
         stackBuilder.addNextIntent(notificationIntent);
-
         // Get a PendingIntent containing the entire back stack.
         PendingIntent notificationPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context);
-
         // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_launcher)
                 // In a real app, you may want to use a library like Volley
                 // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(),
                         R.drawable.ic_launcher))
-                .setColor(Color.RED)
+                .setColor(Color.GREEN)
                 .setContentTitle(caption)
                 .setContentText(caption)
+                .setAutoCancel(true)
+                .setLights(Color.RED, 1000, 500)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
+                .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
                 .setContentIntent(notificationPendingIntent);
-
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-
         // Get an instance of the Notification manager
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
         // Issue the notification
-        mNotificationManager.notify(0, builder.build());
+        mNotificationManager.notify(mNotificationId, builder.build());
         Log.d("SPACETIMEALARM", "Notification sent");
-        Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        Ringtone ringtone = RingtoneManager.getRingtone(context, uri);
-        ringtone.play();
     }
 
     public void setAlarm(SpaceTimeAlarm alarm)
