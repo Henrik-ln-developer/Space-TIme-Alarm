@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
 
     public static final double ZOOM_VARIABLE = 0.01;
     public static final long GEOFENCE_EXPIRATION_TIME = 999999999;
+    public static final String CHANNEL_ID = "my_channel_id";
 
     private ListView listView_Alarms;
     private FloatingActionButton button_NewAlarm;

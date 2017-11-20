@@ -63,7 +63,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime())
                             {
-                                NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
+                                NotificationSender.getInstance(this).sendNotification("Location Alarm", alarm.getCaption(), alarm);
                             }
                             else
                             {
@@ -74,7 +74,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                         {
                             if(currentTime.getTimeInMillis() > alarm.getStartTime() && currentTime.getTimeInMillis() < alarm.getEndTime())
                             {
-                                NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
+                                NotificationSender.getInstance(this).sendNotification("Location Alarm", alarm.getCaption(), alarm);
                             }
                             else
                             {
@@ -84,7 +84,7 @@ public class GeofenceAlarmReceiver extends IntentService {
                     }
                     else
                     {
-                        NotificationSender.sendNotification(this, "Location Alarm", alarm.getCaption(), alarm);
+                        NotificationSender.getInstance(this).sendNotification("Location Alarm", alarm.getCaption(), alarm);
                     }
                 }
                 else
