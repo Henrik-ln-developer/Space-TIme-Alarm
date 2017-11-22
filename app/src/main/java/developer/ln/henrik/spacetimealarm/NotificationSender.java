@@ -70,27 +70,13 @@ public class NotificationSender {
         Intent intent_AlarmPostpone = new Intent(context, NotificationReceiver.class);
         intent_AlarmPostpone.putExtra(MainActivity.EXTRA_ALARM_DONE, false);
         intent_AlarmPostpone.putExtra(MainActivity.EXTRA_ALARM, SpaceTimeAlarmManager.getAlarmByteArray(alarm));
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder_AlarmPostpone = TaskStackBuilder.create(context);
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder_AlarmPostpone.addParentStack(MainActivity.class);
-        // Push the content Intent onto the stack.
-        stackBuilder_AlarmPostpone.addNextIntent(intent_AlarmPostpone);
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent pendingIntent_AlarmPostpone = stackBuilder_AlarmPostpone.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent_AlarmPostpone = PendingIntent.getActivity(context, alarm.getRequestCode()+2000, intent_AlarmPostpone, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Create an explicit content Intent that starts the main Activity.
         Intent intent_AlarmDone = new Intent(context, NotificationReceiver.class);
         intent_AlarmDone.putExtra(MainActivity.EXTRA_ALARM_DONE, true);
         intent_AlarmDone.putExtra(MainActivity.EXTRA_ALARM, SpaceTimeAlarmManager.getAlarmByteArray(alarm));
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder_AlarmDone = TaskStackBuilder.create(context);
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder_AlarmDone.addParentStack(MainActivity.class);
-        // Push the content Intent onto the stack.
-        stackBuilder_AlarmDone.addNextIntent(intent_AlarmDone);
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent pendingIntent_AlarmDone = stackBuilder_AlarmDone.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent pendingIntent_AlarmDone = PendingIntent.getActivity(context, alarm.getRequestCode()+1000, intent_AlarmDone, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainActivity.CHANNEL_ID);
@@ -102,7 +88,6 @@ public class NotificationSender {
                 .setColor(Color.GREEN)
                 .setContentTitle(title)
                 .setContentText(text)
-                .setAutoCancel(true)
                 .setLights(0xFFb71c1c, 1000, 500)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                 .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})

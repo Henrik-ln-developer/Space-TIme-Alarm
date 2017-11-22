@@ -9,6 +9,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 /**
  * Created by Henrik on 20/11/2017.
@@ -32,10 +34,14 @@ public class NotificationReceiver extends AppCompatActivity
         }
         else
         {
-            Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.toString());
-            Intent intent_BackToMain = new Intent(this, MainActivity.class);
-            startActivity(intent_BackToMain);
-        }
+            Calendar newTime = Calendar.getInstance();
+            newTime.setTimeInMillis(newTime.getTimeInMillis() + 1000*60*15);
+            String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
 
+            alarm.setStartTime(newTime.getTimeInMillis());
+            Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.toString());
+            Log.d("SPACESETALARM", "Alarm set to: " + timeString);
+            DatabaseManager.getInstance().updateAlarm(alarm, this);
+        }
     }
 }

@@ -128,7 +128,7 @@ public class SpaceTimeAlarmManager
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(alarm.getId())
                 .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
-                .setExpirationDuration(GEOFENCE_EXPIRATION_TIME)
+                .setExpirationDuration(MainActivity.GEOFENCE_EXPIRATION_TIME)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
                 .setNotificationResponsiveness(1000)
                 .setLoiteringDelay(1000*60*60)
