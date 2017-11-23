@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ListView;
@@ -40,8 +41,8 @@ public class DatabaseManager implements ChildEventListener
     private DatabaseManager(Context context)
     {
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        SharedPreferences sharedPref = context.getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
-        application_id = sharedPref.getString("APPLICATION_ID", null);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        application_id = sharedPref.getString(context.getString(R.string.APPLICATION_ID), null);
         if(application_id == null)
         {
             SharedPreferences.Editor editor = sharedPref.edit();

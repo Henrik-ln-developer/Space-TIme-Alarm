@@ -45,7 +45,6 @@ public class MainActivity extends AppCompatActivity {
 
 
     public static final double ZOOM_VARIABLE = 0.01;
-    public static final long GEOFENCE_EXPIRATION_TIME = 999999999;
     public static final String CHANNEL_ID = "my_channel_id";
 
     private ListView listView_Alarms;
@@ -59,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //setting up the toolbar and suppot
+        //setting up the toolbar and support
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
 

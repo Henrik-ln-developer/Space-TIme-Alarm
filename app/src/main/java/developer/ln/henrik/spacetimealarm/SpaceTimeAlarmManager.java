@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -33,11 +34,11 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.TimeUnit;
 
 import static android.R.attr.content;
 import static android.R.attr.data;
 import static android.content.Context.ALARM_SERVICE;
-import static developer.ln.henrik.spacetimealarm.MainActivity.GEOFENCE_EXPIRATION_TIME;
 import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_LOCATION;
 import static developer.ln.henrik.spacetimealarm.R.id.listView_Alarms;
 
@@ -52,6 +53,9 @@ public class SpaceTimeAlarmManager
     private AlarmManager alarmManager;
     private GeofencingClient geofencingManager;
     private TimeAlarmReceiver timeAlarmReceiver;
+
+    public SharedPreferences sharedPref;
+    public int GEOFENCE_EXPIRATION_TIME;
 
     private SpaceTimeAlarmManager()
     {
@@ -133,6 +137,9 @@ public class SpaceTimeAlarmManager
 
     private void setLocationAlarm(SpaceTimeAlarm alarm)
     {
+        sharedPref = PreferenceManager.getDefaultSharedPreferences(activity);
+        GEOFENCE_EXPIRATION_TIME = sharedPref.getInt(activity.getString(R.string.GEOFENCE_EXPIRATION_TIME), Integer.parseInt(activity.getString(R.string.expireDefaultDuration)));
+
         Intent intent_SetAlarm = new Intent(activity, GeofenceAlarmReceiver.class);
         intent_SetAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
         PendingIntent pendingIntent_Geofence = PendingIntent.getService(activity, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -141,7 +148,7 @@ public class SpaceTimeAlarmManager
         Geofence geofence = new Geofence.Builder()
                 .setRequestId(alarm.getId())
                 .setCircularRegion(alarm.getLocation_Lat(), alarm.getLocation_Lng(), alarm.getRadius())
-                .setExpirationDuration(MainActivity.GEOFENCE_EXPIRATION_TIME)
+                .setExpirationDuration(TimeUnit.DAYS.toMillis(GEOFENCE_EXPIRATION_TIME))
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_DWELL)
                 .setNotificationResponsiveness(1000)
                 .setLoiteringDelay(1000*60*60)

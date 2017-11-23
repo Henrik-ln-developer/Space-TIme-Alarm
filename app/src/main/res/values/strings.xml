@@ -3,4 +3,7 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="google_map_key">AIzaSyAyAD-OmHUTKQo0pXh4FVuR-vNELbS2dZM</string>
     <string name="title_activity_settings">SettingsActivity</string>
+    <string name="expireDefaultDuration">3</string>
+    <string name="GEOFENCE_EXPIRATION_TIME">GEOFENCE_EXPIRATION_TIME</string>
+    <string name="APPLICATION_ID">APPLICATION_ID</string>
 </resources>
