@@ -9,6 +9,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
@@ -42,7 +43,7 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
         TextView locationName = (TextView) rowView.findViewById(R.id.textView_LocationName);
         TextView time = (TextView) rowView.findViewById(R.id.textView_Time);
         final CheckBox done = (CheckBox) rowView.findViewById(R.id.checkBox_Done);
-        final Button button_Delete = (Button) rowView.findViewById(R.id.button_Delete);
+        final ImageButton button_Delete = (ImageButton) rowView.findViewById(R.id.button_Delete);
 
         Animation animation = AnimationUtils.loadAnimation(context, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
         rowView.startAnimation(animation);
