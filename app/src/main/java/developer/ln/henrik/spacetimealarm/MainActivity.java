@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     private DatabaseManager databaseManager;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

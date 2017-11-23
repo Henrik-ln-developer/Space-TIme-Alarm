@@ -46,6 +46,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onClick(View view) {
                 SharedPreferences.Editor editor = sharedPref.edit();
                 int parseExpireTime = Integer.parseInt(expireTime.getText().toString());
+                String newAppID = ""+ appID.getText().toString();
+                editor.putString(getString(R.string.APPLICATION_ID), newAppID);
                 editor.putInt("GEOFENCE_EXPIRATION_TIME", parseExpireTime);
                 editor.commit();
                 Toast.makeText(getApplicationContext(), "Settings Saved", Toast.LENGTH_LONG).show();
