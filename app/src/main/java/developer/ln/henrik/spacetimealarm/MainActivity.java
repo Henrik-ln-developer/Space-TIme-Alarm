@@ -4,7 +4,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -46,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ListView listView_Alarms;
     private FloatingActionButton button_NewAlarm;
+    private Toolbar toolbar;
 
     private DatabaseManager databaseManager;
 
@@ -53,6 +58,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        //setting up the toolbar and suppot
+        toolbar = (Toolbar) findViewById(R.id.my_toolbar);
+        setSupportActionBar(toolbar);
+
         listView_Alarms = (ListView) findViewById(R.id.listView_Alarms);
         SpaceTimeAlarmManager.getInstance().initializeSpaceTimeAlarmManager(this);
         databaseManager = DatabaseManager.getInstance();
@@ -147,5 +157,24 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent_CreateOrEditAlarm, REQUEST_CODE_ALARM);
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                //go to this fancy settings activity!
+                //thought: perhaps have these setting variables somewhere fancy
+                //like Shared Preferences? Send help
+                Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 }
