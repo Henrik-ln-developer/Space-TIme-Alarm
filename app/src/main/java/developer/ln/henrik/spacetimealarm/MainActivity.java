@@ -55,8 +55,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         listView_Alarms = (ListView) findViewById(R.id.listView_Alarms);
         SpaceTimeAlarmManager.getInstance().initializeSpaceTimeAlarmManager(this);
-        databaseManager = DatabaseManager.getInstance();
-        databaseManager.initializeDatabaseManager(this, listView_Alarms);
+        databaseManager = DatabaseManager.getInstance(this);
+        databaseManager.initialize(this, listView_Alarms);
         listView_Alarms.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long id) {
@@ -76,7 +76,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SpaceTimeAlarmManager.getInstance().destroyinitializeSpaceTimeAlarmManager();
+        databaseManager.destroy();
+        // Kan ikke receive alarms hvis der unregisters
+        //SpaceTimeAlarmManager.getInstance().destroySpaceTimeAlarmManager();
     }
 
     @Override
@@ -85,7 +87,6 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_CODE_ALARM) {
             // Make sure the request was successful
             if (resultCode == RESULT_OK) {
-                boolean isEdit = data.getBooleanExtra(EXTRA_EDIT, false);
                 String alarm_Id = data.getStringExtra(EXTRA_ALARM_ID);
                 String caption = data.getStringExtra(EXTRA_CAPTION);
                 String location_Id = data.getStringExtra(EXTRA_LOCATION_ID);
@@ -109,19 +110,19 @@ public class MainActivity extends AppCompatActivity {
                     if(alarm_Id != null)
                     {
                         alarm = new SpaceTimeAlarm(alarm_Id, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
-                        Log.d("SPACESTOREALARM", "Updating alarm with id: " + alarm_Id);
+                        Log.d("SPACESTOREALARM", "Updating alarm: " + alarm_Id);
                     }
                     else
                     {
                         String newId = databaseManager.getNewAlarmID();
                         alarm = new SpaceTimeAlarm(newId, caption, location_Id, location_Name, location_lat, location_lng, radius, startTime, endTime, alarm_RequestCode, done);
-                        Log.d("SPACESTOREALARM", "Creating alarm with id: " + newId);
+                        Log.d("SPACESTOREALARM", "Creating alarm: " + newId);
                     }
                     databaseManager.updateAlarm(alarm);
                 }
                 else
                 {
-                    Log.d("SPACESTOREALARM", "An error occured");
+                    Log.d("SPACESTOREALARM", "An error occured - Insuficient Information");
                 }
             }
             else

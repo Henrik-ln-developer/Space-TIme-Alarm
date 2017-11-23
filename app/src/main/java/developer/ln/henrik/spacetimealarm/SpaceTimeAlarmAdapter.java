@@ -92,14 +92,14 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
                 {
                     alarm.setDone(false);
                 }
-                DatabaseManager.getInstance().updateAlarm(alarm);
+                DatabaseManager.getInstance(context).updateAlarm(alarm);
             }
         });
         done.setFocusable(false);
         button_Delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                DatabaseManager.getInstance().deleteAlarm(alarm);
+                DatabaseManager.getInstance(context).deleteAlarm(alarm);
             }
         });
         button_Delete.setFocusable(false);

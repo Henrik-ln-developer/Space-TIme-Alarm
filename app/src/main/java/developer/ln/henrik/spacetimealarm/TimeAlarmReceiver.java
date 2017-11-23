@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 
@@ -24,6 +25,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
         SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
         if(alarm != null)
         {
+            Log.d("SPACETIMEALARM", "Is for alarm: " + alarm.getId());
             if(alarm.getStartTime() != null)
             {
                 Calendar currentTime = Calendar.getInstance();
@@ -37,7 +39,14 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     else
                     {
                         Log.d("SPACETIMEALARM", "StartTime hasn't happened");
-                        SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
+                        Calendar newTime = Calendar.getInstance();
+                        newTime.setTimeInMillis(newTime.getTimeInMillis() + 1000*60*15);
+                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
+
+                        alarm.setStartTime(newTime.getTimeInMillis());
+                        Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.getId());
+                        Log.d("SPACESETALARM", "Alarm set to: " + timeString);
+                        DatabaseManager.getInstance(context).updateAlarm(alarm);
                     }
                 }
                 else
@@ -49,8 +58,15 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
                     }
                     else
                     {
-                        Log.d("TIMEALARM", "Not within time interval");
-                        SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
+                        Log.d("SPACETIMEALARM", "Not Within time interval");
+                        Calendar newTime = Calendar.getInstance();
+                        newTime.setTimeInMillis(newTime.getTimeInMillis() + 1000*60*15);
+                        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
+
+                        alarm.setStartTime(newTime.getTimeInMillis());
+                        Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.getId());
+                        Log.d("SPACESETALARM", "Alarm set to: " + timeString);
+                        DatabaseManager.getInstance(context).updateAlarm(alarm);
                     }
                 }
             }

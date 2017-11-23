@@ -18,6 +18,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -49,11 +50,6 @@ public class GeofenceAlarmReceiver extends IntentService {
             // Test that the reported transition was of interest.
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)
             {
-                // Get the geofences that were triggered.
-                List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-                // Get the transition details as a String.
-                String geofenceTransitionDetails = getGeofenceTransitionDetails(geofenceTransition, triggeringGeofences);
-                Log.d("SPACEGEOFENCEALARM", geofenceTransitionDetails);
                 SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
                 if (alarm != null)
                 {
@@ -68,7 +64,13 @@ public class GeofenceAlarmReceiver extends IntentService {
                             }
                             else
                             {
-                                SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
+                                Calendar newTime = Calendar.getInstance();
+                                newTime.setTimeInMillis(newTime.getTimeInMillis() + 1000*60*15);
+                                String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
+                                alarm.setStartTime(newTime.getTimeInMillis());
+                                Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.getId());
+                                Log.d("SPACESETALARM", "Alarm set to: " + timeString);
+                                DatabaseManager.getInstance(getApplicationContext()).updateAlarm(alarm);
                             }
                         }
                         else
@@ -79,7 +81,14 @@ public class GeofenceAlarmReceiver extends IntentService {
                             }
                             else
                             {
-                                SpaceTimeAlarmManager.getInstance().posponeAlarm(intent, alarm);
+                                Calendar newTime = Calendar.getInstance();
+                                newTime.setTimeInMillis(newTime.getTimeInMillis() + 1000*60*15);
+                                String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
+
+                                alarm.setStartTime(newTime.getTimeInMillis());
+                                Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.getId());
+                                Log.d("SPACESETALARM", "Alarm set to: " + timeString);
+                                DatabaseManager.getInstance(getApplicationContext()).updateAlarm(alarm);
                             }
                         }
                     }
@@ -97,44 +106,6 @@ public class GeofenceAlarmReceiver extends IntentService {
             {
                 Log.d("SPACEGEOFENCEALARM", "Invalid Geofence Transition Type - " +  geofenceTransition);
             }
-        }
-    }
-
-    private String getGeofenceTransitionDetails(int geofenceTransition, List<Geofence> triggeringGeofences)
-    {
-        String geofenceTransitionString = getTransitionString(geofenceTransition);
-        // Get the Ids of each geofence that was triggered.
-        ArrayList<String> triggeringGeofencesIdsList = new ArrayList<>();
-        for (Geofence geofence : triggeringGeofences)
-        {
-            triggeringGeofencesIdsList.add(geofence.getRequestId());
-        }
-        String triggeringGeofencesIdsString = TextUtils.join(", ",  triggeringGeofencesIdsList);
-        return geofenceTransitionString + ": " + triggeringGeofencesIdsString;
-    }
-
-    private String getTransitionString(int transitionType) {
-        switch (transitionType) {
-            case Geofence.GEOFENCE_TRANSITION_ENTER:
-                return "Transition Enter";
-            case Geofence.GEOFENCE_TRANSITION_EXIT:
-                return "Transition Exit";
-            default:
-                return "Transition UNKNOWN";
-        }
-    }
-
-    /**
-     * Returns the error string for a geofencing exception.
-     */
-    public static String getErrorString(Context context, Exception e) {
-        if (e instanceof ApiException)
-        {
-            return getErrorString(context, ((ApiException) e).getStatusCode());
-        }
-        else
-        {
-            return "Unknown Geofene Error";
         }
     }
 

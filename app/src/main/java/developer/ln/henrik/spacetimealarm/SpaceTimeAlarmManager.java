@@ -75,14 +75,14 @@ public class SpaceTimeAlarmManager
         geofencingManager = LocationServices.getGeofencingClient(activity);
     }
 
-    public void destroyinitializeSpaceTimeAlarmManager()
+    public void destroySpaceTimeAlarmManager()
     {
         unregisterAlarmBroadcast();
     }
 
     public void setAlarm(SpaceTimeAlarm alarm)
     {
-        Log.d("SPACESETALARM", "Setting " + alarm.toString());
+        Log.d("SPACESETALARM", "Setting alarm" + alarm.getId());
         if(alarm.isDone() != null)
         {
             if(!alarm.isDone())
@@ -109,13 +109,26 @@ public class SpaceTimeAlarmManager
             }
             else
             {
-                Log.d("SPACESETALARM", "Couldn't set alarm. Alarm already done");
+                Log.d("SPACESETALARM", "Alarm already done");
             }
         }
         else
         {
             Log.d("SPACESETALARM", "Couldn't set alarm. No done information");
         }
+    }
+
+    public void removeAlarm(SpaceTimeAlarm alarm)
+    {
+        Intent intent_RemoveAlarm = new Intent(activity, GeofenceAlarmReceiver.class);
+        intent_RemoveAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
+        PendingIntent pendingIntent_Alarm = PendingIntent.getService(activity, alarm.getRequestCode(), intent_RemoveAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
+        geofencingManager.removeGeofences(pendingIntent_Alarm);
+        Log.d("SPACESETALARM", "Geofence Alarm removed: " + alarm.getId());
+        intent_RemoveAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
+        pendingIntent_Alarm = PendingIntent.getBroadcast(activity, alarm.getRequestCode(), intent_RemoveAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmManager.cancel(pendingIntent_Alarm);
+        Log.d("SPACESETALARM", "Time Alarm removed" + alarm.getId());
     }
 
     private void setLocationAlarm(SpaceTimeAlarm alarm)
@@ -141,6 +154,7 @@ public class SpaceTimeAlarmManager
             ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
         }
         geofencingManager.removeGeofences(pendingIntent_Geofence);
+        Log.d("SPACESETALARM", "Adding Location alarm for alarm: " + alarm.getId());
         geofencingManager.addGeofences(builder.build(), pendingIntent_Geofence)
                 .addOnSuccessListener(activity, new OnSuccessListener<Void>() {
                     @Override
@@ -163,17 +177,9 @@ public class SpaceTimeAlarmManager
         intent_SetAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
         PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(activity, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent_Alarm);
+        Log.d("SPACESETALARM", "Adding Time alarm for alarm: " + alarm.getId());
         alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarm.getStartTime(), pendingIntent_Alarm);
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(alarm.getStartTime());
-        // For Debugging
-        String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(calendar.getTime()));
-        Log.d("SPACESETALARM", "AlarmManager set to: " + timeString);
-    }
-
-    public void posponeAlarm(Intent intent, SpaceTimeAlarm alarm)
-    {
-        Log.d("SPACETIMEALARM", "Posponing alarm");
+        Log.d("SPACESETALARM", "Time alarm set: " + alarm.getId());
     }
 
     private void registerAlarmBroadcast() {
@@ -182,7 +188,7 @@ public class SpaceTimeAlarmManager
     }
 
     private void unregisterAlarmBroadcast() {
-        activity.getBaseContext().unregisterReceiver(timeAlarmReceiver);
+        activity.unregisterReceiver(timeAlarmReceiver);
     }
 
     public static byte[] getAlarmByteArray(SpaceTimeAlarm alarm)

@@ -160,7 +160,6 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
                     Toast.makeText(SpaceTimeAlarmActivity.this, "An alarm needs a Location or a Start time", Toast.LENGTH_SHORT).show();
                 } else {
                     Intent result_intent = new Intent();
-                    result_intent.putExtra(MainActivity.EXTRA_EDIT, isEdit);
                     result_intent.putExtra(MainActivity.EXTRA_ALARM_ID, alarm_Id);
                     result_intent.putExtra(MainActivity.EXTRA_CAPTION, editText_Caption.getText().toString());
                     if (location != null) {

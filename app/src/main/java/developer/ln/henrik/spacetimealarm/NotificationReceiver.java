@@ -29,8 +29,10 @@ public class NotificationReceiver extends AppCompatActivity
         if(done)
         {
             alarm.setDone(true);
-            Log.d("SPACETIMEALARM", "Updating alarm to done: " + alarm.toString());
-            DatabaseManager.getInstance().updateAlarm(alarm, this);
+            Log.d("SPACETIMEALARM", "Updating alarm to done: " + alarm.getId());
+            //DatabaseManager.getInstance(this).updateAlarm(alarm, this);
+            DatabaseManager.getInstance(this).updateAlarm(alarm);
+            finish();
         }
         else
         {
@@ -39,9 +41,11 @@ public class NotificationReceiver extends AppCompatActivity
             String timeString = (new SimpleDateFormat( "yyyy/MM/dd HH:mm:ss" ).format(newTime.getTime()));
 
             alarm.setStartTime(newTime.getTimeInMillis());
-            Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.toString());
+            Log.d("SPACETIMEALARM", "Postponing alarm: " + alarm.getId());
             Log.d("SPACESETALARM", "Alarm set to: " + timeString);
-            DatabaseManager.getInstance().updateAlarm(alarm, this);
+            //DatabaseManager.getInstance(this).updateAlarm(alarm, this);
+            DatabaseManager.getInstance(this).updateAlarm(alarm);
+            finish();
         }
     }
 }

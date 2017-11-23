@@ -16,6 +16,7 @@ import android.util.Log;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
+import java.util.Calendar;
 
 import static developer.ln.henrik.spacetimealarm.SpaceTimeAlarmManager.getAlarmByteArray;
 
@@ -65,7 +66,7 @@ public class NotificationSender {
     }
 
     public void sendNotification(String title, String text, SpaceTimeAlarm alarm) {
-        Log.d("SPACETIMEALARM", "Sending notification");
+        Log.d("SPACETIMEALARM", "Sending notification of alarm: " + alarm.getId());
         // Create an explicit content Intent that starts the main Activity.
         Intent intent_AlarmPostpone = new Intent(context, NotificationReceiver.class);
         intent_AlarmPostpone.putExtra(MainActivity.EXTRA_ALARM_DONE, false);
@@ -91,10 +92,11 @@ public class NotificationSender {
                 .setLights(0xFFb71c1c, 1000, 500)
                 .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM))
                 .setVibrate(new long[]{100, 200, 300, 400, 500, 400, 300, 200, 400})
+                .setAutoCancel(true)
                 .setDeleteIntent(pendingIntent_AlarmPostpone)
                 .setContentIntent(pendingIntent_AlarmDone);
         // Issue the notification
-        notificationManager.notify((int)(Math.random()*1000), builder.build());
-        Log.d("SPACETIMEALARM", "Notification sent");
+        notificationManager.notify((int)Calendar.getInstance().getTimeInMillis(), builder.build());
+        Log.d("SPACETIMEALARM", "Notification sent for alarm: " + alarm.getId());
     }
 }

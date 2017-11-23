@@ -21,42 +21,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static developer.ln.henrik.spacetimealarm.R.id.listView_Alarms;
+
 /**
  * Created by Henrik on 20/11/2017.
  */
 
 public class DatabaseManager implements ChildEventListener
 {
-    private Activity activity;
-    private ListView listView_Alarms;
-
-    private ArrayList<SpaceTimeAlarm> alarmArray;
-    private SpaceTimeAlarmAdapter alarmAdapter;
-    private DatabaseReference database;
-
     private static DatabaseManager instance;
 
-    private DatabaseManager()
-    {
+    private DatabaseReference database;
+    private String application_id;
 
-    }
 
-    public static DatabaseManager getInstance()
-    {
-        if (instance == null)
-        {
-            instance = new DatabaseManager();
-        }
-        return instance;
-    }
+    private AlarmUpdater alarmUpdater;
 
-    public void initializeDatabaseManager(Activity activity, ListView listView_AlarmsReference)
+    private DatabaseManager(Context context)
     {
-        this.activity = activity;
-        listView_Alarms = listView_AlarmsReference;
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        SharedPreferences sharedPref = activity.getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
-        String application_id = sharedPref.getString("APPLICATION_ID", null);
+        SharedPreferences sharedPref = context.getSharedPreferences("developer.ln.henrik.spacetimealarm.PREFERENCE_FILE_KEY", Context.MODE_PRIVATE);
+        application_id = sharedPref.getString("APPLICATION_ID", null);
         if(application_id == null)
         {
             SharedPreferences.Editor editor = sharedPref.edit();
@@ -65,11 +50,28 @@ public class DatabaseManager implements ChildEventListener
             editor.putString("APPLICATION_ID", application_id);
             editor.commit();
         }
-        alarmArray = new ArrayList<>();
-        alarmAdapter = new SpaceTimeAlarmAdapter(alarmArray, activity);
         database = firebaseDatabase.getReference(application_id + "/alarms");
         database.addChildEventListener(this);
-        listView_Alarms.setAdapter(alarmAdapter);
+    }
+
+    public static DatabaseManager getInstance(Context context)
+    {
+        if (instance == null)
+        {
+            Log.d("SPACEWOOP", "NEW BITCHES");
+            instance = new DatabaseManager(context);
+        }
+        return instance;
+    }
+
+    public void initialize(Activity activity, ListView listView_AlarmsReference)
+    {
+        alarmUpdater = new AlarmUpdater(activity, listView_AlarmsReference);
+    }
+
+    public void destroy()
+    {
+        database.removeEventListener(this);
     }
 
     public String getNewAlarmID()
@@ -84,6 +86,7 @@ public class DatabaseManager implements ChildEventListener
 
     public void updateAlarm(SpaceTimeAlarm alarm)
     {
+        Log.d("SPACESTOREALARM", "Saving/updating alarm: " + alarm.getId());
         Map<String, Object> postValues = alarm.toMap();
         Map<String, Object> childUpdates = new HashMap<>();
         childUpdates.put("/" + alarm.getId(), postValues);
@@ -91,127 +94,57 @@ public class DatabaseManager implements ChildEventListener
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()) {
-                    Log.d("SPACESTOREALARM", "Alarm Saved to database");
+                    Log.d("SPACESTOREALARM", "Alarm saved/updated");
                 } else {
-                    Log.d("SPACECHECKSTUFF", task.getException().getMessage().toString());
+                    Log.d("SPACECHECKSTUFF", "Alarm not saved/updated - " + task.getException().getMessage().toString());
                 }
-            }
-        });
-    }
-
-    public void updateAlarm(SpaceTimeAlarm alarm, Activity activity)
-    {
-        final Activity currentActivity = activity;
-        Map<String, Object> postValues = alarm.toMap();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("/" + alarm.getId(), postValues);
-        database.updateChildren(childUpdates).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    Log.d("SPACESTOREALARM", "Alarm Saved to database");
-                } else {
-                    Log.d("SPACECHECKSTUFF", task.getException().getMessage().toString());
-                }
-                Intent i = new Intent(currentActivity, MainActivity.class);
-                i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                currentActivity.startActivity(i);
             }
         });
     }
 
     public int getNextAlarmRequestCode()
     {
-        int highestRequestCode = 0;
-        for(SpaceTimeAlarm alarm : alarmArray)
-        {
-            if (alarm.getRequestCode() != null)
-            {
-                int currentRequestCode = alarm.getRequestCode();
-                if(currentRequestCode > highestRequestCode)
-                {
-                    highestRequestCode = currentRequestCode;
-                }
-            }
-        }
-        return highestRequestCode+1;
+        return alarmUpdater.getNextAlarmRequestCode();
     }
 
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         SpaceTimeAlarm alarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
-        if(alarm != null)
+        if(alarmUpdater != null)
         {
-            alarmArray.add(alarm);
-            alarmAdapter.notifyDataSetChanged();
-            SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
+            alarmUpdater.addAlarm(alarm);
         }
+        else
+        {
+            Log.d("SPACECHANGEDALARM", "Couldn't add alarm to list. AlarmUpdater not set");
+        }
+        SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
     }
 
     @Override
     public void onChildChanged(DataSnapshot dataSnapshot, String s) {
         SpaceTimeAlarm changedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
-        if(changedAlarm != null)
+        if(alarmUpdater != null)
         {
-            Log.d("SPACECHANGEDALARM", "Leder efter alarm med ID: " + changedAlarm.getId());
-            for(SpaceTimeAlarm alarm : alarmArray)
-            {
-                if(alarm.getId() != null)
-                {
-                    Log.d("SPACECHANGEDALARM", "Checker alarm med ID: " + alarm.getId());
-                    if(alarm.getId().equals(changedAlarm.getId()))
-                    {
-                        alarm.setCaption(changedAlarm.getCaption());
-                        alarm.setLocation_Id(changedAlarm.getLocation_Id());
-                        alarm.setLocation_Name(changedAlarm.getLocation_Name());
-                        alarm.setLocation_Lat(changedAlarm.getLocation_Lat());
-                        alarm.setLocation_Lng(changedAlarm.getLocation_Lng());
-                        alarm.setRadius(changedAlarm.getRadius());
-                        alarm.setStartTime(changedAlarm.getStartTime());
-                        alarm.setEndTime(changedAlarm.getEndTime());
-                        alarm.setRequestCode(changedAlarm.getRequestCode());
-                        alarm.setDone(changedAlarm.isDone());
-                        alarmAdapter.notifyDataSetChanged();
-                        SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
-                        return;
-                    }
-                }
-                else
-                {
-                    Log.d("SPACECHANGEDALARM", "Ingen ID på alarm");
-                }
-            }
-            Log.d("SPACECHANGEDALARM", "Alarm changed in database, but hasn't been changed in list");
-            Toast.makeText(activity.getApplicationContext(), "Alarm changed in database, but hasn't been changed in list", Toast.LENGTH_SHORT).show();
+            alarmUpdater.updateAlarm(changedAlarm);
         }
+        else
+        {
+            Log.d("SPACECHANGEDALARM", "Couldn't update alarm on list. AlarmUpdater not set");
+        }
+        SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
     }
 
     @Override
     public void onChildRemoved(DataSnapshot dataSnapshot) {
         SpaceTimeAlarm deletedAlarm = dataSnapshot.getValue(SpaceTimeAlarm.class);
-        if(deletedAlarm != null)
+        if(alarmUpdater != null)
         {
-            Log.d("SPACEREMOVEDALARM", "Leder efter alarm med ID: " + deletedAlarm.getId());
-            for(SpaceTimeAlarm alarm : alarmArray)
-            {
-                if(alarm.getId() != null)
-                {
-                    Log.d("SPACEREMOVEDALARM", "Checker alarm med ID: " + alarm.getId());
-                    if(alarm.getId().equals(deletedAlarm.getId()))
-                    {
-                        Log.d("SPACEREMOVEDALARM", "Remover alarm med ID: " + alarm.getId());
-                        alarmArray.remove(alarm);
-                        alarmAdapter.notifyDataSetChanged();
-                        return;
-                    }
-                }
-                else
-                {
-                    Log.d("SPACEREMOVEDALARM", "Ingen ID på alarm");
-                }
-            }
-            Log.d("SPACEREMOVEDALARM", "Alarm removed from database, but hasn't been removed from list");
-            Toast.makeText(activity.getApplicationContext(), "Alarm removed from database, but hasn't been removed from list", Toast.LENGTH_SHORT).show();
+            alarmUpdater.removeAlarm(deletedAlarm);
+        }
+        else
+        {
+            Log.d("SPACECHANGEDALARM", "Couldn't remove alarm. AlarmUpdater not set");
         }
     }
 
