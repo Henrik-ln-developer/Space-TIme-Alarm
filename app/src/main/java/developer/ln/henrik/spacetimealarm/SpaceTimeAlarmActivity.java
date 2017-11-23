@@ -1,5 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -258,6 +260,16 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.create_new_alarm_menu, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // handle button click here
+        if (item.getItemId() == android.R.id.home) {
+            setResult(Activity.RESULT_CANCELED);
+            finish(); // close this activity and return to preview activity
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     class TimePickerHandler extends Handler implements Serializable {

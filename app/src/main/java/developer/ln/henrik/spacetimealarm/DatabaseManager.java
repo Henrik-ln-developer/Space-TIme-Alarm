@@ -108,6 +108,11 @@ public class DatabaseManager implements ChildEventListener
         return alarmUpdater.getNextAlarmRequestCode();
     }
 
+    public void notifyForUpdate()
+    {
+        alarmUpdater.notifyForUpdate();
+    }
+
     @Override
     public void onChildAdded(DataSnapshot dataSnapshot, String s) {
         SpaceTimeAlarm alarm = dataSnapshot.getValue(SpaceTimeAlarm.class);

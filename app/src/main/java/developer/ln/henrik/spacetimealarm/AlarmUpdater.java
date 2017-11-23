@@ -118,4 +118,9 @@ public class AlarmUpdater {
         }
 
     }
+
+    public void notifyForUpdate()
+    {
+        alarmAdapter.notifyDataSetChanged();
+    }
 }

@@ -83,6 +83,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onStart() {
+        super.onStart();
+        databaseManager.notifyForUpdate();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         databaseManager.destroy();
