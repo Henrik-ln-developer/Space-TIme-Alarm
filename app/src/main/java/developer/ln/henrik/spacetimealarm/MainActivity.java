@@ -147,6 +147,10 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("SPACESTOREALARM", "An error occured - Result Not OK");
             }
         }
+        else
+        {
+            Log.d("SPACESTOREALARM", "An error occured - Unknown RequestCode");
+        }
     }
 
     private void createOrEditAlarm(SpaceTimeAlarm alarm)

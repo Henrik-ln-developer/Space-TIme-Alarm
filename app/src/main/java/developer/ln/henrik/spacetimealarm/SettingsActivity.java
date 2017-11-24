@@ -1,5 +1,6 @@
 package developer.ln.henrik.spacetimealarm;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -54,6 +55,11 @@ public class SettingsActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    public Intent getSupportParentActivityIntent() {
+        finish();
+        return null;
     }
 
 }

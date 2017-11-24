@@ -299,4 +299,9 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
             }
         }
     }
+
+    public Intent getSupportParentActivityIntent() {
+        finish();
+        return null;
+    }
 }
