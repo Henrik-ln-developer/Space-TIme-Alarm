@@ -157,7 +157,6 @@ public class DatabaseManager implements ChildEventListener
         {
             Log.d("SPACECHANGEDALARM", "Couldn't update alarm on list. AlarmUpdater not set");
         }
-        SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
     }
 
     @Override

@@ -26,7 +26,11 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
         if(alarm != null)
         {
             Log.d("SPACETIMEALARM", "Is for alarm: " + alarm.getId());
-            if(alarm.getStartTime() != null)
+            if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
+            {
+                SpaceTimeAlarmManager.getInstance().setAlarm(alarm);
+            }
+            else if(alarm.getStartTime() != null)
             {
                 Calendar currentTime = Calendar.getInstance();
                 if(alarm.getEndTime() == null)

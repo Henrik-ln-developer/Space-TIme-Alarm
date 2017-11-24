@@ -125,6 +125,47 @@ public class SpaceTimeAlarmManager
         }
     }
 
+    public void setPostponedAlarm(SpaceTimeAlarm alarm)
+    {
+        Log.d("SPACESETALARM", "Setting postponed location alarm" + alarm.getId());
+        if(alarm.isDone() != null)
+        {
+            if(!alarm.isDone())
+            {
+                if(alarm.getRequestCode() != null)
+                {
+                    if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
+                    {
+                        if(alarm.getStartTime() != null)
+                        {
+                            setTimeAlarm(alarm);
+                        }
+                        else
+                        {
+                            Log.d("SPACESETALARM", "Couldn't set postponed location alarm. Insufficient Time information");
+                        }
+                    }
+                    else
+                    {
+                        Log.d("SPACESETALARM", "Couldn't set postponed location alarm. Insufficient location information");
+                    }
+                }
+                else
+                {
+                    Log.d("SPACESETALARM", "Couldn't set postponed location alarm. No requst code");
+                }
+            }
+            else
+            {
+                Log.d("SPACESETALARM", "Alarm already done");
+            }
+        }
+        else
+        {
+            Log.d("SPACESETALARM", "Couldn't set postponed location alarm. No done information");
+        }
+    }
+
     public void removeAlarm(SpaceTimeAlarm alarm)
     {
         Intent intent_RemoveAlarm = new Intent(activity, GeofenceAlarmReceiver.class);

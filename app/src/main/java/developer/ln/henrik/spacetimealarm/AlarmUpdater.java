@@ -71,10 +71,22 @@ public class AlarmUpdater {
                         alarm.setLocation_Lat(changedAlarm.getLocation_Lat());
                         alarm.setLocation_Lng(changedAlarm.getLocation_Lng());
                         alarm.setRadius(changedAlarm.getRadius());
-                        alarm.setStartTime(changedAlarm.getStartTime());
                         alarm.setEndTime(changedAlarm.getEndTime());
                         alarm.setRequestCode(changedAlarm.getRequestCode());
                         alarm.setDone(changedAlarm.isDone());
+                        if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
+                        {
+                            if(changedAlarm.getStartTime() > alarm.getStartTime())
+                            {
+                                alarm.setStartTime(changedAlarm.getStartTime());
+                                SpaceTimeAlarmManager.getInstance().setPostponedAlarm(changedAlarm);
+                            }
+                            else
+                            {
+                                alarm.setStartTime(changedAlarm.getStartTime());
+                                SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
+                            }
+                        }
                         alarmAdapter.notifyDataSetChanged();
                         return;
                     }
@@ -102,8 +114,8 @@ public class AlarmUpdater {
                     if(alarm.getId().equals(deletedAlarm.getId()))
                     {
                         Log.d("SPACEREMOVEDALARM", "Child Removed: Remover alarm med ID: " + alarm.getId());
-                        SpaceTimeAlarmManager.getInstance().removeAlarm(alarm);
                         alarmArray.remove(alarm);
+                        SpaceTimeAlarmManager.getInstance().removeAlarm(alarm);
                         alarmAdapter.notifyDataSetChanged();
                         return;
                     }
