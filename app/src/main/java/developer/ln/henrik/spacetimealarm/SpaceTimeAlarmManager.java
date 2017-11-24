@@ -161,10 +161,12 @@ public class SpaceTimeAlarmManager
         builder.addGeofences(geofences);
         if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
+            Log.d("SPACESETALARM", "Need permission");
             ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
         }
         else
         {
+            Log.d("SPACESETALARM", "Already have permission");
             MainActivity.havePermission = true;
         }
         while(!MainActivity.havePermission)

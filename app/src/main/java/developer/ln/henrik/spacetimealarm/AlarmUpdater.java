@@ -119,6 +119,14 @@ public class AlarmUpdater {
 
     }
 
+    public void clearAlarms()
+    {
+        while(alarmArray.size() > 0)
+        {
+            removeAlarm(alarmArray.get(alarmArray.size() - 1));
+        }
+    }
+
     public void notifyForUpdate()
     {
         alarmAdapter.notifyDataSetChanged();

@@ -51,13 +51,18 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.putString(getString(R.string.APPLICATION_ID), newAppID);
                 editor.putInt("GEOFENCE_EXPIRATION_TIME", parseExpireTime);
                 editor.commit();
-                Toast.makeText(getApplicationContext(), "Settings Saved", Toast.LENGTH_LONG).show();
+                Intent result_intent = new Intent();
+                result_intent.putExtra(MainActivity.EXTRA_APPLICATION_ID, APPLICATION_ID);
+                setResult(RESULT_OK, result_intent);
                 finish();
             }
         });
     }
 
     public Intent getSupportParentActivityIntent() {
+        Intent result_intent = new Intent();
+        result_intent.putExtra(MainActivity.EXTRA_APPLICATION_ID, APPLICATION_ID);
+        setResult(RESULT_CANCELED, result_intent);
         finish();
         return null;
     }

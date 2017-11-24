@@ -13,6 +13,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,14 +40,14 @@ public class MainActivity extends AppCompatActivity {
     public static final String EXTRA_RADIUS = "EXTRA RADIUS";
     public static final String EXTRA_DONE = "EXTRA DONE";
     public static final String EXTRA_ALARM_DONE = "EXTRA ALARM DONE";
-
+    public static final String EXTRA_APPLICATION_ID = "EXTRA APPLICATION ID";
 
     public static final int REQUEST_CODE_ALARM = 1;
     public static final int REQUEST_CODE_LOCATION = 2;
     public static final int REQUEST_CODE_START_TIME = 3;
     public static final int REQUEST_CODE_END_TIME = 4;
     public static final int REQUEST_CODE_FINE_LOCATION = 5;
-
+    public static final int REQUEST_CODE_SETTINGS = 6;
 
     public static final double ZOOM_VARIABLE = 0.01;
     public static final String CHANNEL_ID = "my_channel_id";
@@ -58,8 +59,6 @@ public class MainActivity extends AppCompatActivity {
     private Toolbar toolbar;
 
     private DatabaseManager databaseManager;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -154,6 +153,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("SPACESTOREALARM", "An error occured - Result Not OK");
             }
         }
+        else if (requestCode == REQUEST_CODE_SETTINGS)
+        {
+            if (resultCode == RESULT_OK)
+            {
+                Toast.makeText(getApplicationContext(), "Settings Saved", Toast.LENGTH_LONG).show();
+                databaseManager.updateApplicationId();
+            }
+            else
+            {
+                Log.d("SPACESTOREALARM", "An error occured - Result Not OK");
+            }
+        }
         else
         {
             Log.d("SPACESTOREALARM", "An error occured - Unknown RequestCode");
@@ -190,7 +201,7 @@ public class MainActivity extends AppCompatActivity {
                 //thought: perhaps have these setting variables somewhere fancy
                 //like Shared Preferences? Send help
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, REQUEST_CODE_SETTINGS);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

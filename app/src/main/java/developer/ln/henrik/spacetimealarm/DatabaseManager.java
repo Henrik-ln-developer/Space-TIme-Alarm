@@ -17,6 +17,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -34,14 +35,15 @@ public class DatabaseManager implements ChildEventListener
 
     private DatabaseReference database;
     private String application_id;
-
+    private Context context;
 
     private AlarmUpdater alarmUpdater;
 
     private DatabaseManager(Context context)
     {
+        this.context = context;
         FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
-        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.context);
         application_id = sharedPref.getString(context.getString(R.string.APPLICATION_ID), null);
         if(application_id == null)
         {
@@ -72,7 +74,7 @@ public class DatabaseManager implements ChildEventListener
 
     public void destroy()
     {
-        database.removeEventListener(this);
+        database.removeEventListener((ChildEventListener)this);
     }
 
     public String getNewAlarmID()
@@ -111,6 +113,23 @@ public class DatabaseManager implements ChildEventListener
     public void notifyForUpdate()
     {
         alarmUpdater.notifyForUpdate();
+    }
+
+    public void updateApplicationId()
+    {
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.context);
+        String newApplication_id = sharedPref.getString(this.context.getString(R.string.APPLICATION_ID), null);
+        if(newApplication_id != null)
+        {
+            if(application_id == null || !newApplication_id.equals(application_id))
+            {
+                alarmUpdater.clearAlarms();
+                application_id = newApplication_id;
+                FirebaseDatabase firebaseDatabase = FirebaseDatabase.getInstance();
+                database = firebaseDatabase.getReference(application_id + "/alarms");
+                database.addChildEventListener(this);
+            }
+        }
     }
 
     @Override
