@@ -3,6 +3,7 @@ package developer.ln.henrik.spacetimealarm;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -12,6 +13,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -47,6 +51,8 @@ public class MainActivity extends AppCompatActivity {
     public static final double ZOOM_VARIABLE = 0.01;
     public static final String CHANNEL_ID = "my_channel_id";
 
+    public static boolean havePermission;
+
     private ListView listView_Alarms;
     private FloatingActionButton button_NewAlarm;
     private Toolbar toolbar;
@@ -57,6 +63,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.d("SPACESTOREALARM", "CREATING");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -92,10 +99,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.d("SPACESTOREALARM", "DESTROYING");
         super.onDestroy();
         databaseManager.destroy();
-        // Kan ikke receive alarms hvis der unregisters
-        //SpaceTimeAlarmManager.getInstance().destroySpaceTimeAlarmManager();
+        SpaceTimeAlarmManager.getInstance().destroySpaceTimeAlarmManager();
     }
 
     @Override
@@ -187,6 +194,26 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
+        int index = 0;
+        Map<String, Integer> PermissionsMap = new HashMap<String, Integer>();
+        for (String permission : permissions){
+            PermissionsMap.put(permission, grantResults[index]);
+            index++;
+        }
+
+        if((PermissionsMap.get("ACCESS_FINE_LOCATION") != 0)){
+
+            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
+        }
+        else
+        {
+            havePermission = true;
         }
     }
 }

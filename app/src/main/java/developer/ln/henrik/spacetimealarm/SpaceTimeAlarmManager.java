@@ -15,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.Space;
 import android.util.Log;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -34,6 +35,8 @@ import java.io.ObjectOutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static android.R.attr.content;
@@ -59,7 +62,7 @@ public class SpaceTimeAlarmManager
 
     private SpaceTimeAlarmManager()
     {
-
+        MainActivity.havePermission = false;
     }
 
     public static SpaceTimeAlarmManager getInstance()
@@ -156,9 +159,23 @@ public class SpaceTimeAlarmManager
         ArrayList<Geofence> geofences = new ArrayList<>();
         geofences.add(geofence);
         builder.addGeofences(geofences);
-        if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
+        if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
+        }
+        else
+        {
+            MainActivity.havePermission = true;
+        }
+        while(!MainActivity.havePermission)
+        {
+            Log.d("SPACESETALARM", "Waiting for permission");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
         }
         geofencingManager.removeGeofences(pendingIntent_Geofence);
         Log.d("SPACESETALARM", "Adding Location alarm for alarm: " + alarm.getId());

@@ -264,12 +264,17 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // handle button click here
-        if (item.getItemId() == android.R.id.home) {
-            setResult(Activity.RESULT_CANCELED);
-            finish(); // close this activity and return to preview activity
+        switch (item.getItemId()) {
+            case R.id.action_settings:
+                //go to this fancy settings activity!
+                //thought: perhaps have these setting variables somewhere fancy
+                //like Shared Preferences? Send help
+                Intent intent = new Intent(SpaceTimeAlarmActivity.this, SettingsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-        return super.onOptionsItemSelected(item);
     }
 
     class TimePickerHandler extends Handler implements Serializable {
