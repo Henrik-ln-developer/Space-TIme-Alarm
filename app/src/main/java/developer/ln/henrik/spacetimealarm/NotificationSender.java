@@ -66,18 +66,13 @@ public class NotificationSender {
         intent_AlarmPostpone.putExtra(context.getString(R.string.EXTRA_ALARM), SpaceTimeAlarmManager.getAlarmByteArray(alarm));
         PendingIntent pendingIntent_AlarmPostpone = PendingIntent.getActivity(context, alarm.getRequestCode()+2000, intent_AlarmPostpone, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Create an explicit content Intent that starts the main Activity.
         Intent intent_AlarmDone = new Intent(context, NotificationReceiver.class);
         intent_AlarmDone.putExtra(context.getString(R.string.EXTRA_ALARM_DONE), true);
         intent_AlarmDone.putExtra(context.getString(R.string.EXTRA_ALARM), SpaceTimeAlarmManager.getAlarmByteArray(alarm));
         PendingIntent pendingIntent_AlarmDone = PendingIntent.getActivity(context, alarm.getRequestCode()+1000, intent_AlarmDone, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        // Get a notification builder that's compatible with platform versions >= 4
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(R.string.CHANNEL_ID));
-        // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_launcher)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
                 .setLargeIcon(BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_launcher))
                 .setColor(Color.GREEN)
                 .setContentTitle(title)
@@ -88,7 +83,7 @@ public class NotificationSender {
                 .setAutoCancel(true)
                 .setDeleteIntent(pendingIntent_AlarmPostpone)
                 .setContentIntent(pendingIntent_AlarmDone);
-        // Issue the notification
+
         notificationManager.notify((int)Calendar.getInstance().getTimeInMillis(), builder.build());
         Log.d("SPACETIMEALARM", "Notification sent for alarm: " + alarm.getId());
     }

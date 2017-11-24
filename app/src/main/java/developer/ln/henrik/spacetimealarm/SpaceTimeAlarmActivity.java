@@ -33,6 +33,9 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
+/**
+ * Created by Henrik on 07/11/2017.
+ */
 
 public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -61,7 +64,6 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
 
         toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         editText_Caption = (EditText) findViewById(R.id.editText_Caption);
@@ -264,9 +266,6 @@ public class SpaceTimeAlarmActivity extends AppCompatActivity implements View.On
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //go to this fancy settings activity!
-                //thought: perhaps have these setting variables somewhere fancy
-                //like Shared Preferences? Send help
                 Intent intent = new Intent(SpaceTimeAlarmActivity.this, SettingsActivity.class);
                 startActivity(intent);
                 return true;

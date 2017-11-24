@@ -4,6 +4,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by Henrik on 07/11/2017.
+ */
 
 public class SpaceTimeAlarm implements Serializable {
 

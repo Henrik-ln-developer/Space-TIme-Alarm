@@ -17,6 +17,9 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Created by Henrik on 07/11/2017.
+ */
 
 public class MainActivity extends AppCompatActivity {
     public static boolean havePermission;
@@ -55,12 +58,6 @@ public class MainActivity extends AppCompatActivity {
                 createOrEditAlarm(null);
             }
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        databaseManager.notifyForUpdate();
     }
 
     @Override
@@ -165,9 +162,6 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_settings:
-                //go to this fancy settings activity!
-                //thought: perhaps have these setting variables somewhere fancy
-                //like Shared Preferences? Send help
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivityForResult(intent, getResources().getInteger(R.integer.REQUEST_CODE_SETTINGS));
                 return true;
@@ -178,7 +172,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-
         int index = 0;
         Map<String, Integer> PermissionsMap = new HashMap<String, Integer>();
         for (String permission : permissions){

@@ -10,6 +10,10 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+/**
+ * Created by Christoffer on 07/11/2017.
+ */
+
 public class SettingsActivity extends AppCompatActivity {
 
     public SharedPreferences sharedPref;
@@ -37,7 +41,6 @@ public class SettingsActivity extends AppCompatActivity {
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         GEOFENCE_EXPIRATION_TIME = sharedPref.getInt(getString(R.string.GEOFENCE_EXPIRATION_TIME),Integer.parseInt(getString(R.string.expireDefaultDuration)));
         APPLICATION_ID = sharedPref.getString(getString(R.string.APPLICATION_ID),null);
-
         editText_expirationTime.setText(GEOFENCE_EXPIRATION_TIME+"");
         editText_ApplicationID.setText(APPLICATION_ID);
 

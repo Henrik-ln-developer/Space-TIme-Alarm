@@ -109,11 +109,6 @@ public class DatabaseManager implements ChildEventListener
         return alarmUpdater.getNextAlarmRequestCode();
     }
 
-    public void notifyForUpdate()
-    {
-        alarmUpdater.notifyForUpdate();
-    }
-
     public void updateApplicationId()
     {
         SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this.context);

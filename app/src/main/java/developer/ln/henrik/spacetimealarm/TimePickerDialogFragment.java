@@ -7,6 +7,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.TimePicker;
 
+/**
+ * Created by Henrik on 07/11/2017.
+ */
 
 public class TimePickerDialogFragment extends android.support.v4.app.DialogFragment {
     private int timeHour;

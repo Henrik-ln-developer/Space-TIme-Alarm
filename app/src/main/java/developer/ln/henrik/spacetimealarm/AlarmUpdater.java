@@ -77,10 +77,8 @@ public class AlarmUpdater {
                         alarm.setDone(changedAlarm.isDone());
                         if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
                         {
-                            //location alarm
                             if(changedAlarm.getStartTime() != null)
                             {
-                                // location with time updated or postponed location
                                 if(alarm.getStartTime() != null)
                                 {
                                     if(changedAlarm.getStartTime() > alarm.getStartTime())
@@ -95,7 +93,6 @@ public class AlarmUpdater {
                                 }
                                 else
                                 {
-                                    //updated to have startTime
                                     Calendar currentTime = Calendar.getInstance();
                                     if(currentTime.getTimeInMillis() > changedAlarm.getStartTime())
                                     {
@@ -109,13 +106,11 @@ public class AlarmUpdater {
                             }
                             else
                             {
-                                // normal location updated
                                 SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
                             }
                         }
                         else
                         {
-                            // time alarm
                             SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
                         }
                         alarm.setStartTime(changedAlarm.getStartTime());
@@ -169,10 +164,5 @@ public class AlarmUpdater {
         {
             removeAlarm(alarmArray.get(alarmArray.size() - 1));
         }
-    }
-
-    public void notifyForUpdate()
-    {
-        alarmAdapter.notifyDataSetChanged();
     }
 }
