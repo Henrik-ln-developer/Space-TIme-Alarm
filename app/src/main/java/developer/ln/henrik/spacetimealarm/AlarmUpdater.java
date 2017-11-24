@@ -87,6 +87,11 @@ public class AlarmUpdater {
                                 SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
                             }
                         }
+                        else
+                        {
+                            alarm.setStartTime(changedAlarm.getStartTime());
+                            SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
+                        }
                         alarmAdapter.notifyDataSetChanged();
                         return;
                     }
