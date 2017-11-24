@@ -1,14 +1,9 @@
 package developer.ln.henrik.spacetimealarm;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -24,8 +19,8 @@ public class NotificationReceiver extends AppCompatActivity
         super.onCreate(savedInstanceState);
 
         Log.d("SPACETIMEALARM", "Notification received");
-        boolean done = getIntent().getBooleanExtra(MainActivity.EXTRA_ALARM_DONE, false);
-        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(getIntent().getByteArrayExtra(MainActivity.EXTRA_ALARM));
+        boolean done = getIntent().getBooleanExtra(getString(R.string.EXTRA_ALARM_DONE), false);
+        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(getIntent().getByteArrayExtra(getString(R.string.EXTRA_ALARM)));
         if(done)
         {
             alarm.setDone(true);

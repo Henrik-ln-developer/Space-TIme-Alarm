@@ -21,19 +21,19 @@ public class TimePickerDialogFragment extends android.support.v4.app.DialogFragm
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         Bundle bundle = getArguments();
 
-        handler = (Handler) bundle.getSerializable(MainActivity.EXTRA_HANDLER);
-        type = bundle.getInt(MainActivity.EXTRA_TYPE);
-        timeHour = bundle.getInt(MainActivity.EXTRA_HOUR);
-        timeMinute = bundle.getInt(MainActivity.EXTRA_MIN);
+        handler = (Handler) bundle.getSerializable(getString(R.string.EXTRA_HANDLER));
+        type = bundle.getInt(getString(R.string.EXTRA_TYPE));
+        timeHour = bundle.getInt(getString(R.string.EXTRA_HOUR));
+        timeMinute = bundle.getInt(getString(R.string.EXTRA_MIN));
 
         TimePickerDialog.OnTimeSetListener listener = new TimePickerDialog.OnTimeSetListener() {
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 timeHour = hourOfDay;
                 timeMinute = minute;
                 Bundle b = new Bundle();
-                b.putInt(MainActivity.EXTRA_TYPE, type);
-                b.putInt(MainActivity.EXTRA_HOUR, timeHour);
-                b.putInt(MainActivity.EXTRA_MIN, timeMinute);
+                b.putInt(getString(R.string.EXTRA_TYPE), type);
+                b.putInt(getString(R.string.EXTRA_HOUR), timeHour);
+                b.putInt(getString(R.string.EXTRA_MIN), timeMinute);
                 Message msg = new Message();
                 msg.setData(b);
                 handler.sendMessage(msg);

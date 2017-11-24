@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="REQUEST_CODE_ALARM">1</integer>
+    <integer name="REQUEST_CODE_LOCATION">2</integer>
+    <integer name="REQUEST_CODE_START_TIME">3</integer>
+    <integer name="REQUEST_CODE_END_TIME">4</integer>
+    <integer name="REQUEST_CODE_FINE_LOCATION">5</integer>
+    <integer name="REQUEST_CODE_SETTINGS">6</integer>
+</resources>

@@ -1,27 +1,18 @@
 package developer.ln.henrik.spacetimealarm;
 
-import android.app.Activity;
 import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.List;
 
 /**
  * Created by Henrik on 14/11/2017.
@@ -50,7 +41,7 @@ public class GeofenceAlarmReceiver extends IntentService {
             // Test that the reported transition was of interest.
             if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER || geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL)
             {
-                SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
+                SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(getString(R.string.EXTRA_ALARM)));
                 if (alarm != null)
                 {
                     if(alarm.getStartTime() != null)

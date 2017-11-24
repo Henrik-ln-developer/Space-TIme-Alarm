@@ -3,7 +3,6 @@ package developer.ln.henrik.spacetimealarm;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -13,12 +12,7 @@ import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Calendar;
-
-import static developer.ln.henrik.spacetimealarm.SpaceTimeAlarmManager.getAlarmByteArray;
 
 /**
  * Created by Henrik on 20/11/2017.
@@ -30,13 +24,12 @@ public class NotificationSender {
     private  NotificationManager notificationManager;
     private static Context context;
 
-    private NotificationSender(Context contextReference)
+    private NotificationSender()
     {
-
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {
             // The id of the channel.
-            String id = MainActivity.CHANNEL_ID;
+            String id = context.getString(R.string.CHANNEL_ID);
             // The user-visible name of the channel.
             CharSequence name = "Channel Name";
             // The user-visible description of the channel.
@@ -60,7 +53,7 @@ public class NotificationSender {
         context = contextReference;
         if (instance == null)
         {
-            instance = new NotificationSender(context);
+            instance = new NotificationSender();
         }
         return instance;
     }
@@ -69,18 +62,18 @@ public class NotificationSender {
         Log.d("SPACETIMEALARM", "Sending notification of alarm: " + alarm.getId());
         // Create an explicit content Intent that starts the main Activity.
         Intent intent_AlarmPostpone = new Intent(context, NotificationReceiver.class);
-        intent_AlarmPostpone.putExtra(MainActivity.EXTRA_ALARM_DONE, false);
-        intent_AlarmPostpone.putExtra(MainActivity.EXTRA_ALARM, SpaceTimeAlarmManager.getAlarmByteArray(alarm));
+        intent_AlarmPostpone.putExtra(context.getString(R.string.EXTRA_ALARM_DONE), false);
+        intent_AlarmPostpone.putExtra(context.getString(R.string.EXTRA_ALARM), SpaceTimeAlarmManager.getAlarmByteArray(alarm));
         PendingIntent pendingIntent_AlarmPostpone = PendingIntent.getActivity(context, alarm.getRequestCode()+2000, intent_AlarmPostpone, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Create an explicit content Intent that starts the main Activity.
         Intent intent_AlarmDone = new Intent(context, NotificationReceiver.class);
-        intent_AlarmDone.putExtra(MainActivity.EXTRA_ALARM_DONE, true);
-        intent_AlarmDone.putExtra(MainActivity.EXTRA_ALARM, SpaceTimeAlarmManager.getAlarmByteArray(alarm));
+        intent_AlarmDone.putExtra(context.getString(R.string.EXTRA_ALARM_DONE), true);
+        intent_AlarmDone.putExtra(context.getString(R.string.EXTRA_ALARM), SpaceTimeAlarmManager.getAlarmByteArray(alarm));
         PendingIntent pendingIntent_AlarmDone = PendingIntent.getActivity(context, alarm.getRequestCode()+1000, intent_AlarmDone, PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, MainActivity.CHANNEL_ID);
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, context.getString(R.string.CHANNEL_ID));
         // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_launcher)
                 // In a real app, you may want to use a library like Volley

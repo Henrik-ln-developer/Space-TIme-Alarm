@@ -1,15 +1,10 @@
 package developer.ln.henrik.spacetimealarm;
 
-import android.app.Activity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInput;
-import java.io.ObjectInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
@@ -22,7 +17,7 @@ public class TimeAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.d("SPACETIMEALARM", "Received TimeAlarm");
-        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(MainActivity.EXTRA_ALARM));
+        SpaceTimeAlarm alarm = SpaceTimeAlarmManager.getAlarm(intent.getByteArrayExtra(context.getString(R.string.EXTRA_ALARM)));
         if(alarm != null)
         {
             Log.d("SPACETIMEALARM", "Is for alarm: " + alarm.getId());

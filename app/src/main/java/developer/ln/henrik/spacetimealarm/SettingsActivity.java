@@ -9,7 +9,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Toast;
 
 public class SettingsActivity extends AppCompatActivity {
 
@@ -18,9 +17,9 @@ public class SettingsActivity extends AppCompatActivity {
     public String APPLICATION_ID;
 
     private Toolbar toolbar;
-    private EditText expireTime;
+    private EditText editText_expirationTime;
     private Button saveButton;
-    private EditText appID;
+    private EditText editText_ApplicationID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,28 +30,28 @@ public class SettingsActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        expireTime = (EditText) findViewById(R.id.expireDateField);
+        editText_expirationTime = (EditText) findViewById(R.id.editText_ExpirationTime);
         saveButton = (Button) findViewById(R.id.save_button);
-        appID = (EditText) findViewById(R.id.appIDField);
+        editText_ApplicationID = (EditText) findViewById(R.id.editText_ApplicationID);
 
         sharedPref = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         GEOFENCE_EXPIRATION_TIME = sharedPref.getInt(getString(R.string.GEOFENCE_EXPIRATION_TIME),Integer.parseInt(getString(R.string.expireDefaultDuration)));
         APPLICATION_ID = sharedPref.getString(getString(R.string.APPLICATION_ID),null);
 
-        expireTime.setText(GEOFENCE_EXPIRATION_TIME+"");
-        appID.setText(APPLICATION_ID);
+        editText_expirationTime.setText(GEOFENCE_EXPIRATION_TIME+"");
+        editText_ApplicationID.setText(APPLICATION_ID);
 
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 SharedPreferences.Editor editor = sharedPref.edit();
-                int parseExpireTime = Integer.parseInt(expireTime.getText().toString());
-                String newAppID = ""+ appID.getText().toString();
+                int parseExpireTime = Integer.parseInt(editText_expirationTime.getText().toString());
+                String newAppID = ""+ editText_ApplicationID.getText().toString();
                 editor.putString(getString(R.string.APPLICATION_ID), newAppID);
                 editor.putInt("GEOFENCE_EXPIRATION_TIME", parseExpireTime);
                 editor.commit();
                 Intent result_intent = new Intent();
-                result_intent.putExtra(MainActivity.EXTRA_APPLICATION_ID, APPLICATION_ID);
+                result_intent.putExtra(getString(R.string.EXTRA_APPLICATION_ID), APPLICATION_ID);
                 setResult(RESULT_OK, result_intent);
                 finish();
             }
@@ -61,7 +60,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     public Intent getSupportParentActivityIntent() {
         Intent result_intent = new Intent();
-        result_intent.putExtra(MainActivity.EXTRA_APPLICATION_ID, APPLICATION_ID);
+        result_intent.putExtra(getString(R.string.EXTRA_APPLICATION_ID), APPLICATION_ID);
         setResult(RESULT_CANCELED, result_intent);
         finish();
         return null;

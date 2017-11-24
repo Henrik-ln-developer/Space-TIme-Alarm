@@ -18,7 +18,7 @@
         app:title="Settings" />
 
     <EditText
-        android:id="@+id/expireDateField"
+        android:id="@+id/editText_ExpirationTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -49,19 +49,19 @@
         android:text="Save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appIDField" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_ApplicationID" />
 
     <TextView
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="App ID"
+        android:text="Application ID"
         app:layout_constraintStart_toStartOf="@+id/textView"
         app:layout_constraintTop_toBottomOf="@+id/textView" />
 
     <EditText
-        android:id="@+id/appIDField"
+        android:id="@+id/editText_ApplicationID"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
@@ -70,7 +70,7 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/expireDateField"
-        app:layout_constraintTop_toBottomOf="@+id/expireDateField" />
+        app:layout_constraintStart_toStartOf="@+id/editText_ExpirationTime"
+        app:layout_constraintTop_toBottomOf="@+id/editText_ExpirationTime" />
 
 </android.support.constraint.ConstraintLayout>

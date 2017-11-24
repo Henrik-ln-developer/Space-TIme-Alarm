@@ -3,7 +3,6 @@ package developer.ln.henrik.spacetimealarm;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -12,10 +11,7 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.widget.Space;
 import android.util.Log;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -23,8 +19,6 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -32,18 +26,10 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static android.R.attr.content;
-import static android.R.attr.data;
 import static android.content.Context.ALARM_SERVICE;
-import static developer.ln.henrik.spacetimealarm.MainActivity.REQUEST_CODE_FINE_LOCATION;
-import static developer.ln.henrik.spacetimealarm.R.id.listView_Alarms;
 
 /**
  * Created by Henrik on 20/11/2017.
@@ -169,7 +155,7 @@ public class SpaceTimeAlarmManager
     public void removeAlarm(SpaceTimeAlarm alarm)
     {
         Intent intent_RemoveAlarm = new Intent(activity, GeofenceAlarmReceiver.class);
-        intent_RemoveAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
+        intent_RemoveAlarm.putExtra(activity.getString(R.string.EXTRA_ALARM), getAlarmByteArray(alarm));
         PendingIntent pendingIntent_Alarm = PendingIntent.getService(activity, alarm.getRequestCode(), intent_RemoveAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
         geofencingManager.removeGeofences(pendingIntent_Alarm);
         Log.d("SPACESETALARM", "Geofence Alarm removed: " + alarm.getId());
@@ -185,7 +171,7 @@ public class SpaceTimeAlarmManager
         GEOFENCE_EXPIRATION_TIME = sharedPref.getInt(activity.getString(R.string.GEOFENCE_EXPIRATION_TIME), Integer.parseInt(activity.getString(R.string.expireDefaultDuration)));
 
         Intent intent_SetAlarm = new Intent(activity, GeofenceAlarmReceiver.class);
-        intent_SetAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
+        intent_SetAlarm.putExtra(activity.getString(R.string.EXTRA_ALARM), getAlarmByteArray(alarm));
         PendingIntent pendingIntent_Geofence = PendingIntent.getService(activity, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
         GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
         builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);
@@ -203,7 +189,7 @@ public class SpaceTimeAlarmManager
         if (ContextCompat.checkSelfPermission(activity, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED)
         {
             Log.d("SPACESETALARM", "Need permission");
-            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_CODE_FINE_LOCATION);
+            ActivityCompat.requestPermissions(activity, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, activity.getResources().getInteger(R.integer.REQUEST_CODE_FINE_LOCATION));
         }
         else
         {
@@ -241,7 +227,7 @@ public class SpaceTimeAlarmManager
     {
         Intent intent_SetAlarm = new Intent(activity, TimeAlarmReceiver.class);
         intent_SetAlarm.setAction("developer.ln-henrik.spacetimealarm.alarmfilter");
-        intent_SetAlarm.putExtra(MainActivity.EXTRA_ALARM, getAlarmByteArray(alarm));
+        intent_SetAlarm.putExtra(activity.getString(R.string.EXTRA_ALARM), getAlarmByteArray(alarm));
         PendingIntent pendingIntent_Alarm = PendingIntent.getBroadcast(activity, alarm.getRequestCode(), intent_SetAlarm, PendingIntent.FLAG_UPDATE_CURRENT);
         alarmManager.cancel(pendingIntent_Alarm);
         Log.d("SPACESETALARM", "Adding Time alarm for alarm: " + alarm.getId());

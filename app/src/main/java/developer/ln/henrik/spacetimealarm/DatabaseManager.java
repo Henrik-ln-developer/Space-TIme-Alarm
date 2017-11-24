@@ -2,13 +2,11 @@ package developer.ln.henrik.spacetimealarm;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -17,13 +15,9 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import static developer.ln.henrik.spacetimealarm.R.id.listView_Alarms;
 
 /**
  * Created by Henrik on 20/11/2017.
@@ -47,11 +41,16 @@ public class DatabaseManager implements ChildEventListener
         application_id = sharedPref.getString(context.getString(R.string.APPLICATION_ID), null);
         if(application_id == null)
         {
+            Log.d("SPACEWOOP", "Creating new application ID");
             SharedPreferences.Editor editor = sharedPref.edit();
             DatabaseReference root = firebaseDatabase.getReference();
             application_id = root.push().getKey();
-            editor.putString("APPLICATION_ID", application_id);
+            editor.putString(context.getString(R.string.APPLICATION_ID), application_id);
             editor.commit();
+        }
+        else
+        {
+            Log.d("SPACEWOOP", "Allready got application ID");
         }
         database = firebaseDatabase.getReference(application_id + "/alarms");
         database.addChildEventListener(this);
@@ -61,7 +60,7 @@ public class DatabaseManager implements ChildEventListener
     {
         if (instance == null)
         {
-            Log.d("SPACEWOOP", "NEW BITCHES");
+            Log.d("SPACEWOOP", "NEW DatabaseManager BITCHES");
             instance = new DatabaseManager(context);
         }
         return instance;
