@@ -25,7 +25,6 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
 
     private ArrayList<SpaceTimeAlarm> dataSet;
     private Context context;
-    private int lastPosition = -1;
 
     public SpaceTimeAlarmAdapter(ArrayList<SpaceTimeAlarm> data, Context context) {
         super(context, R.layout.space_time_alarm_row, data);
@@ -44,10 +43,6 @@ public class SpaceTimeAlarmAdapter extends ArrayAdapter<SpaceTimeAlarm> {
         TextView time = (TextView) rowView.findViewById(R.id.textView_Time);
         final CheckBox done = (CheckBox) rowView.findViewById(R.id.checkBox_Done);
         final ImageButton button_Delete = (ImageButton) rowView.findViewById(R.id.button_Delete);
-
-        Animation animation = AnimationUtils.loadAnimation(context, (position > lastPosition) ? R.anim.up_from_bottom : R.anim.down_from_top);
-        rowView.startAnimation(animation);
-        lastPosition = position;
 
         if(alarm != null)
         {
