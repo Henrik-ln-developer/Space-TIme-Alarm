@@ -6,6 +6,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 /**
  * Created by Henrik on 22/11/2017.
@@ -76,22 +77,48 @@ public class AlarmUpdater {
                         alarm.setDone(changedAlarm.isDone());
                         if(alarm.getLocation_Lat() != null && alarm.getLocation_Lng() != null && alarm.getRadius() != null)
                         {
-                            if(changedAlarm.getStartTime() > alarm.getStartTime())
+                            //location alarm
+                            if(changedAlarm.getStartTime() != null)
                             {
-                                alarm.setStartTime(changedAlarm.getStartTime());
-                                SpaceTimeAlarmManager.getInstance().setPostponedAlarm(changedAlarm);
+                                // location with time updated or postponed location
+                                if(alarm.getStartTime() != null)
+                                {
+                                    if(changedAlarm.getStartTime() > alarm.getStartTime())
+                                    {
+
+                                        SpaceTimeAlarmManager.getInstance().setPostponedAlarm(changedAlarm);
+                                    }
+                                    else
+                                    {
+                                        SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
+                                    }
+                                }
+                                else
+                                {
+                                    //updated to have startTime
+                                    Calendar currentTime = Calendar.getInstance();
+                                    if(currentTime.getTimeInMillis() > changedAlarm.getStartTime())
+                                    {
+                                        SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
+                                    }
+                                    else
+                                    {
+                                        SpaceTimeAlarmManager.getInstance().setPostponedAlarm(changedAlarm);
+                                    }
+                                }
                             }
                             else
                             {
-                                alarm.setStartTime(changedAlarm.getStartTime());
+                                // normal location updated
                                 SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
                             }
                         }
                         else
                         {
-                            alarm.setStartTime(changedAlarm.getStartTime());
+                            // time alarm
                             SpaceTimeAlarmManager.getInstance().setAlarm(changedAlarm);
                         }
+                        alarm.setStartTime(changedAlarm.getStartTime());
                         alarmAdapter.notifyDataSetChanged();
                         return;
                     }

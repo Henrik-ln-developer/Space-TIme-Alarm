@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity {
                 Double location_lng = data.getDoubleExtra(EXTRA_LOCATION_LNG, 0);
                 location_lng = location_lng == 0 ? null : location_lng;
                 Integer radius = data.getIntExtra(EXTRA_RADIUS, 0);
+                radius = radius == 0 ? null : radius;
                 Long startTime = data.getLongExtra(EXTRA_START_TIME, 0);
                 startTime = startTime == 0 ? null : startTime;
                 Long endTime = data.getLongExtra(EXTRA_END_TIME, 0);
